@@ -1,0 +1,14 @@
+
+# Ignore IDEs and Editor files  
+*.idea/  
+*.vscode/  
+*.sublime-workspace  
+*.sublime-project  
+
+# Ignore build directories  
+/build/  
+**/target/  
+**/dist/  
+
+# Ignore logs  
+*.log  
