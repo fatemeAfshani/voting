@@ -1,9 +1,9 @@
 package org.voting.usermanagement.ports.outbound.persistance
 
-import org.voting.usermanagement.adaptor.persistance.entity.Creator
+import org.voting.usermanagement.domain.creator.CreatorModel
 
 interface CreatorDataMapperInterface {
-    fun findById(id: String): List<Creator>
+    fun findOneById(id: String): CreatorModel?
 
-    fun save(creator: Creator)
+    fun save(creator: CreatorModel)
 }

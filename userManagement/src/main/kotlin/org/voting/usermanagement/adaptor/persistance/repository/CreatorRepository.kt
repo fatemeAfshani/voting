@@ -6,7 +6,7 @@ import org.voting.usermanagement.adaptor.persistance.entity.Creator
 
 
 interface CreatorRepository : MongoRepository<Creator, ObjectId> {
-    fun findById(id: String): List<Creator>
+    fun findOneById(id: String): Creator
 
     fun save(creator: Creator)
 }
