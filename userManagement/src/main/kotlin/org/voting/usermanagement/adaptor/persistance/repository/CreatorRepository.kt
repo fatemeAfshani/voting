@@ -9,4 +9,6 @@ interface CreatorRepository : MongoRepository<Creator, ObjectId> {
     fun findOneById(id: String): Creator
 
     fun save(creator: Creator)
+
+    fun findByPhone(phoneNumber: String):Creator
 }

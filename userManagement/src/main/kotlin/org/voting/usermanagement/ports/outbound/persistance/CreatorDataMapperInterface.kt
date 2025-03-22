@@ -6,4 +6,5 @@ interface CreatorDataMapperInterface {
     fun findOneById(id: String): CreatorModel?
 
     fun save(creator: CreatorModel)
+    fun findByPhoneNumber(phoneNumber: String): CreatorModel?
 }

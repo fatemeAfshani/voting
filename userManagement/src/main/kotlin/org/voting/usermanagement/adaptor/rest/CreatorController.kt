@@ -1,6 +1,8 @@
 package org.voting.usermanagement.adaptor.rest
 
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -21,4 +23,24 @@ class CreatorController(
                 "user has been registered successfully.",
             )
     }
+
+    @PostMapping
+    fun loginCreator(@RequestBody request: RegisterDto): ResponseEntity<CreatorResponse> {
+        service.login(request)
+        return ResponseEntity
+            .ok(
+                "user has been registered successfully.",
+            )
+    }
+
+//    @GetMapping("/{id}")
+//    fun findCreatorById(@PathVariable id: String): ResponseEntity<CreatorResponse> {
+//        val creator = service.findById(id)
+//
+//        return ResponseEntity
+//            .ok(
+//                CreatorResponse.fromModel(creator)
+//            )
+//    }
+
 }
