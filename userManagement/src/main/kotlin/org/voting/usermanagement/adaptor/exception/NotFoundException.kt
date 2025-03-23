@@ -1,0 +1,3 @@
+package org.voting.usermanagement.adaptor.exception
+
+class NotFoundException(message: String = "Resource not found") : GeneralException(message, 404)

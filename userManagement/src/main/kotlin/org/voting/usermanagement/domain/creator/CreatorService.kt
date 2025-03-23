@@ -22,6 +22,6 @@ class CreatorService(
             //throw error
         }
         val token = "random token"
-        return creator
+        return creator!! to token
     }
 }

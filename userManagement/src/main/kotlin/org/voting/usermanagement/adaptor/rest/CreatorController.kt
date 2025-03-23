@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import org.voting.usermanagement.adaptor.rest.dto.CreatorLoginResponse
+import org.voting.usermanagement.adaptor.rest.mapper.CreatorResponseMapper
 import org.voting.usermanagement.domain.creator.CreatorService
 import org.voting.usermanagement.domain.creator.dto.RegisterDto
 
@@ -25,11 +27,11 @@ class CreatorController(
     }
 
     @PostMapping
-    fun loginCreator(@RequestBody request: RegisterDto): ResponseEntity<CreatorResponse> {
-        service.login(request)
+    fun loginCreator(@RequestBody request: RegisterDto): ResponseEntity<CreatorLoginResponse> {
+        val creator = service.login(request)
         return ResponseEntity
             .ok(
-                "user has been registered successfully.",
+                CreatorResponseMapper.mapper.modelToDto(creator.first, creator.second)
             )
     }
 
