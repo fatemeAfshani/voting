@@ -12,15 +12,15 @@ class CreatorService(
     private val creatorDataMapperImp: CreatorDataMapperImp
 ) : CreatorUseCase {
     override fun register(registerDto: RegisterDto) {
-        val (phoneNumber, password, userName) = registerDto
-        val model = CreatorModel(phone = phoneNumber, password = password, userName = userName)
+        val (phone, password, userName) = registerDto
+        val model = CreatorModel(phone = phone, password = password, userName = userName)
         creatorDataMapperImp.save(model)
     }
 
     override fun login(registerDto: RegisterDto): CreatorModel {
-        val (phoneNumber, password) = registerDto
-        val creator = phoneNumber?.let { creatorDataMapperImp.findByPhoneNumber(it) }
-        if(creator == null || password != creator.password) {
+        val (phone, password) = registerDto
+        val creator = phone?.let { creatorDataMapperImp.findByPhoneNumber(it) }
+        if (creator == null || password != creator.password) {
             throw NotFoundException(Error.ErrorCodes.USER_NOT_FOUND.name)
         }
         return creator
