@@ -24,10 +24,10 @@ jobs:
           architecture: x64
 
       - name: Build with Gradle
-        run: ./gradlew build --no-daemon
+        run: cd userManagement && ./gradlew build --stacktrace
 
       - name: Run Detekt
-        run: ./gradlew detekt
+        run: cd userManagement && ./gradlew detekt
 
-      - name: Run tests
-        run: ./gradlew test
+      - name: Run Unit Tests
+        run: cd userManagement && ./gradlew test
