@@ -21,7 +21,7 @@ class CreatorDataMapperImp(
     }
 
     override fun findByPhoneNumber(phoneNumber: String): CreatorModel? {
-        val entity = creatorRepository.findByPhone(phoneNumber)
+        val entity = creatorRepository.findFirstByPhone(phoneNumber)
         return CreatorMapper.mapper.entityToModel(entity)
     }
 }
