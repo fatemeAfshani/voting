@@ -5,5 +5,5 @@ import org.voting.usermanagement.domain.creator.dto.RegisterDto
 
 interface CreatorUseCase {
     fun register(registerDto: RegisterDto)
-    fun login(registerDto: RegisterDto): Pair<CreatorModel, String>
+    fun login(registerDto: RegisterDto): CreatorModel
 }

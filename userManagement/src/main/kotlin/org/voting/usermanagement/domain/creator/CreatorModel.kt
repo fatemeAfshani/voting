@@ -9,6 +9,7 @@ data class CreatorModel(
     var version: Long? = null,
     var email: String? = null,
     var phone: String? = null,
+    val userName: String? = null,
     var password: String? = null,
     var company: String? = null,
 )

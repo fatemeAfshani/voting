@@ -27,6 +27,7 @@ dependencies {
     implementation("org.mapstruct.extensions.spring:mapstruct-spring-annotations:0.1.2")
     implementation("org.mapstruct:mapstruct:1.5.3.Final")
     kapt("org.mapstruct:mapstruct-processor:1.5.3.Final")
+    implementation("com.auth0:java-jwt:4.2.1")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
