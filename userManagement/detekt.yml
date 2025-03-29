@@ -1,0 +1,28 @@
+build:
+  maxIssues: 10
+  excludeCorrectable: false
+
+config:
+  validation: true
+
+processors:
+  active: true
+
+console-reports:
+  active: true
+
+style:
+  MagicNumber:
+    active: false
+  WildcardImport:
+    active: true
+  MaxLineLength:
+    active: true
+    maxLineLength: 120
+
+formatting:
+  Indentation:
+    active: true
+  MaximumLineLength:
+    active: true
+    maxLineLength: 120
