@@ -1,10 +1,10 @@
 plugins {
-    kotlin("jvm") version "1.9.25"
-    kotlin("plugin.spring") version "1.9.25"
+    kotlin("jvm") version "1.9.23"
+    kotlin("plugin.spring") version "1.9.23"
     id("org.springframework.boot") version "3.4.2"
     id("io.spring.dependency-management") version "1.1.7"
-    kotlin("kapt") version "1.7.21"
-    id("io.gitlab.arturbosch.detekt") version "1.23.7"
+    kotlin("kapt") version "1.9.23"
+    id("io.gitlab.arturbosch.detekt") version "1.23.6"
 }
 
 group = "org.voting"
@@ -28,9 +28,12 @@ dependencies {
     implementation("org.mapstruct.extensions.spring:mapstruct-spring-annotations:0.1.2")
     implementation("org.mapstruct:mapstruct:1.5.3.Final")
     kapt("org.mapstruct:mapstruct-processor:1.5.3.Final")
-    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.1")
+    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.6")
     implementation("com.auth0:java-jwt:4.2.1")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.testcontainers:testcontainers:1.18.1")
+    testImplementation("org.testcontainers:junit-jupiter:1.18.1")
+    testImplementation("org.testcontainers:mongodb:1.18.1")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
@@ -60,7 +63,8 @@ tasks.withType<Test> {
 
 detekt {
     basePath = projectDir.path
-    config.setFrom("detekt/config.yml")
+    config.setFrom("detekt.yml")
     buildUponDefaultConfig = false
     parallel = true
+
 }
