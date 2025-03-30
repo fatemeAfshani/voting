@@ -15,7 +15,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import org.testcontainers.containers.MongoDBContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
-import org.voting.usermanagement.adaptor.persistance.repository.MongoCreatorRepository
+import org.voting.usermanagement.adaptor.persistance.repository.PollRepository
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -29,7 +29,7 @@ class CreatorIntegrationTest {
     private lateinit var mockMvc: MockMvc
 
     @Autowired
-    var mongoCreatorRepository: MongoCreatorRepository? = null
+    var creatorRepository: PollRepository? = null
 
     companion object {
         @Container

@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package org.voting.grpc;
+
+service PollService {
+  rpc CreatePoll (PollRequest) returns (PollResponse);
+  rpc GetPollById (PollIdRequest) returns (PollResponse);
+  rpc GetActivePolls (Empty) returns (PollListResponse);
+  rpc UpdatePoll (PollRequest) returns (PollResponse);
+}
+
+message PollRequest {
+  string creatorId = 1;
+  string title = 2;
+  string description = 3;
+  string status = 4;
+  int32 price = 5;
+  int32 maxVoters = 6;
+  map<string, string> preferences = 7;
+}
+
+message PollResponse {
+  string id = 1;
+  string creatorId = 2;
+  string title = 3;
+  string description = 4;
+  string status = 5;
+  int32 price = 6;
+  int32 maxVoters = 7;
+  map<string, string> preferences = 8;
+}
+
+message PollIdRequest {
+  string id = 1;
+}
+
+message PollListResponse {
+  repeated PollResponse polls = 1;
+}
+
+message Empty {}
