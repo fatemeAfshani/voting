@@ -1,4 +1,4 @@
-package org.voting.usermanagement.adaptor.rest.dto
+package org.voting.usermanagement.adaptor.api.dto
 
 data class CreatorLoginResponse(
     var id: String? = null,

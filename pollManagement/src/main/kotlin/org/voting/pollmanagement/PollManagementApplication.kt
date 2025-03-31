@@ -4,8 +4,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class UserManagementApplication
+class PollManagementApplication
 
 fun main(args: Array<String>) {
-    runApplication<UserManagementApplication>(*args)
+    runApplication<PollManagementApplication>(*args)
 }

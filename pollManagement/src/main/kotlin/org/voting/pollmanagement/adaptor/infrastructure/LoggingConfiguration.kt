@@ -10,6 +10,6 @@ class LoggingConfiguration {
 
     @Bean
     fun logger(): Logger {
-        return LoggerFactory.getLogger("userManagement.logging")
+        return LoggerFactory.getLogger("pollManagement.logging")
     }
 }

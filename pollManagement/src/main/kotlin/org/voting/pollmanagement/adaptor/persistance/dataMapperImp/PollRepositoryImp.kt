@@ -10,21 +10,20 @@ import org.voting.pollmanagement.domain.ports.outbound.persistance.PollRepositor
 @Component
 class PollRepositoryImp(
     private val mongoPollRepository: MongoPollRepository
-) : PollRepository  {
+) : PollRepository {
     override fun save(poll: PollModel): PollModel? {
-val entity = PollMapper.mapper.modelToEntity(poll)
-        val savedEntity = entity?.let { mongoPollRepository.save(entity)}
-            return PollMapper.mapper.entityToModel(savedEntity)
-
+        val entity = PollMapper.mapper.modelToEntity(poll)
+        val savedEntity = entity?.let { mongoPollRepository.save(entity) }
+        return PollMapper.mapper.entityToModel(savedEntity)
     }
 
     override fun findById(id: String): PollModel? {
-val entity = mongoPollRepository.findOneById(id)
+        val entity = mongoPollRepository.findOneById(id)
         return PollMapper.mapper.entityToModel(entity)
     }
 
     override fun findByStatus(status: PollStatus): List<PollModel?> {
         val entities = mongoPollRepository.findByStatus(status)
-       return entities.map { PollMapper.mapper.entityToModel(it) }
+        return entities.map { PollMapper.mapper.entityToModel(it) }
     }
 }

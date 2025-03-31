@@ -5,33 +5,29 @@ import org.voting.pollmanagement.domain.poll.enums.QuestionType
 import java.util.Date
 
 data class PollModel(
-    val id: String? = null,
-    val creatorId: String,
-    val title: String,
-    val description: String? = null,
-    val status: PollStatus = PollStatus.DRAFT,
-    val price: Int = 0,
-    val maxVoters: Int = 0,
-    val createDate: Date = Date(),
-    val updatedAt: Date = Date(),
-    val questions: List<PollQuestion> = listOf(),
-    val preferences: PollPreferences? = null
+    var id: String? = null,
+    var creatorId: String,
+    var title: String,
+    var description: String? = null,
+    var status: PollStatus = PollStatus.DRAFT,
+    var price: Int = 0,
+    var maxVoters: Int = 0,
+    var version: Long = 0,
+    var createDate: Date = Date(),
+    var updatedAt: Date = Date(),
+    var questions: List<PollQuestion> = listOf(),
+    var preferences: Map<String, String>? = null
 )
 
 data class PollQuestion(
-    val questionId: String = java.util.UUID.randomUUID().toString(),
-    val questionText: String,
-    val questionType: QuestionType,
-    val options: List<PollOption> = listOf()
+    var questionId: String = java.util.UUID.randomUUID().toString(),
+    var questionText: String,
+    var questionType: QuestionType,
+    var options: List<PollOption> = listOf()
 )
 
 data class PollOption(
-    val optionId: String = java.util.UUID.randomUUID().toString(),
-    val optionText: String
+    var optionId: String = java.util.UUID.randomUUID().toString(),
+    var optionText: String
 )
 
-data class PollPreferences(
-    val ageRange: List<String> = listOf(),
-    val gender: List<String> = listOf(),
-    val educationLevel: List<String> = listOf()
-)
