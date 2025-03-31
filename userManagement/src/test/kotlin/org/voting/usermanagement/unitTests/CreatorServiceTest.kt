@@ -6,7 +6,7 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
-import org.voting.usermanagement.adaptor.persistance.dataMapperImp.CreatorDataMapperImp
+import org.voting.usermanagement.adaptor.persistance.dataMapperImp.CreatorRepositoryImp
 import org.voting.usermanagement.domain.creator.CreatorModel
 import org.voting.usermanagement.domain.creator.CreatorService
 import org.voting.usermanagement.domain.creator.dto.RegisterDto
@@ -19,7 +19,7 @@ class CreatorServiceTest {
     private lateinit var service: CreatorService
 
     @Mock
-    private lateinit var creatorDataMapperImp: CreatorDataMapperImp
+    private lateinit var creatorRepositoryImp: CreatorRepositoryImp
 
     @Test
     fun `should register creator`() {
@@ -32,7 +32,7 @@ class CreatorServiceTest {
         val request = RegisterDto("1234567890", "password123")
         val creator = CreatorModel(id = "1", phone = "1234567890", password = "password123", userName = "testUser")
 
-        `when`(creatorDataMapperImp.findByPhoneNumber("1234567890")).thenReturn(creator)
+        `when`(creatorRepositoryImp.findByPhoneNumber("1234567890")).thenReturn(creator)
 
         val result = service.login(request)
 

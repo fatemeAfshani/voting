@@ -7,9 +7,9 @@ import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.http.ResponseEntity
-import org.voting.usermanagement.adaptor.rest.CreatorController
-import org.voting.usermanagement.adaptor.rest.JwtUtil
-import org.voting.usermanagement.adaptor.rest.dto.CreatorLoginResponse
+import org.voting.usermanagement.adaptor.api.CreatorController
+import org.voting.usermanagement.adaptor.api.JwtUtil
+import org.voting.usermanagement.adaptor.api.dto.CreatorLoginResponse
 import org.voting.usermanagement.domain.creator.CreatorModel
 import org.voting.usermanagement.domain.creator.CreatorService
 import org.voting.usermanagement.domain.creator.dto.RegisterDto

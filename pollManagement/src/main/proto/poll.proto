@@ -1,0 +1,51 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+
+option java_multiple_files = true;
+option java_package = "org.voting.poll";
+option java_outer_classname = "PollProto";
+
+package pollManagement;
+
+
+service PollService {
+  rpc CreatePoll (PollRequest) returns (PollResponse);
+  rpc GetPollById (PollIdRequest) returns (PollResponse);
+  rpc GetActivePolls (google.protobuf.Empty) returns (PollListResponse);
+  rpc UpdatePoll (PollRequest) returns (PollResponse);
+}
+
+enum PollStatus {
+  DRAFT = 0;
+  ACTIVE = 1;
+  CLOSED = 2;
+}
+
+message PollRequest {
+  string creatorId = 1;
+  string title = 2;
+  string description = 3;
+  PollStatus status = 4;
+  int64 price = 5;
+  int32 maxVoters = 6;
+  map<string, string> preferences = 7;
+}
+
+message PollResponse {
+  string id = 1;
+  string creatorId = 2;
+  string title = 3;
+  string description = 4;
+  PollStatus status = 5;
+  int64 price = 6;
+  int32 maxVoters = 7;
+  map<string, string> preferences = 8;
+}
+
+message PollIdRequest {
+  string id = 1;
+}
+
+message PollListResponse {
+  repeated PollResponse polls = 1;
+}
