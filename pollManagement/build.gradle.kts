@@ -96,7 +96,7 @@ tasks.jar {
         )
     }
     archiveBaseName.set("poll-management")
-    destinationDirectory.set(file("${layout.buildDirectory}/libs"))
+    destinationDirectory.set(file("$buildDir/libs"))
 }
 
 tasks.processResources {

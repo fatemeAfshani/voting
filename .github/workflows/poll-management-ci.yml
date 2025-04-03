@@ -1,16 +1,16 @@
-name: UserManagement Pipeline
+name: PollManagement Pipeline
 
 on:
   push:
     branches:
       - main
     paths:
-      - 'userManagement/**'
+      - 'pollManagement/**'
   pull_request:
     branches:
       - main
     paths:
-      - 'userManagement/**'
+      - 'pollManagement/**'
 
 jobs:
   build:
@@ -28,10 +28,10 @@ jobs:
           architecture: x64
 
       - name: Build with Gradle
-        run: cd userManagement && ./gradlew build --stacktrace
+        run: cd pollManagement && ./gradlew build --stacktrace
 
       - name: Run Detekt
-        run: cd userManagement && ./gradlew detekt
+        run: cd pollManagement && ./gradlew detekt
 
       - name: Run Unit Tests
-        run: cd userManagement && ./gradlew test
+        run: cd pollManagement && ./gradlew test

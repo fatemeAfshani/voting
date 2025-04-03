@@ -1,0 +1,23 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+  - role: control-plane
+    extraPortMappings:
+      - containerPort: 80
+        hostPort: 80
+      - containerPort: 443
+        hostPort: 443
+      - containerPort: 30000
+        hostPort: 30000  # Port for NodePort services (if needed)
+      - containerPort: 32000
+        hostPort: 32000  # Port for gRPC services (if needed)
+  - role: worker
+  - role: worker
+  - role: worker
+networking:
+  disableDefaultCNI: false
+  kubeProxyMode: "iptables"
+containerdConfigPatches:
+  - |  # Ensures Kubernetes can pull images from Docker Hub
+    [plugins."io.containerd.grpc.v1.cri".registry.mirrors."docker.io"]
+      endpoint = ["https://registry-1.docker.io"]
