@@ -1,9 +1,21 @@
-FROM openjdk:17-jdk-slim
+# ---- Stage 1: Build ----
+FROM gradle:8.5-jdk17-alpine AS build
 
 WORKDIR /app
 
-COPY ./build/libs/user-management-0.0.1-SNAPSHOT-plain.jar app.jar
+COPY . .
+
+RUN gradle bootJar --no-daemon
+
+# ---- Stage 2: Run ----
+FROM eclipse-temurin:17-jdk-alpine
+
+WORKDIR /app
+
+COPY --from=build app/build/libs/*.jar app.jar
+
+ENV SPRING_PROFILES_ACTIVE=production
 
 EXPOSE 8080
 
-ENTRYPOINT ["java","-jar","app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -11,7 +11,7 @@ class JwtUtil(
     @Value("\${jwt.secret}") private val secretKey: String,
 ) {
     companion object {
-        const val EXPIRATION_DAYS = 30 * 24 * 60 * 60 * 1000L
+        const val EXPIRATION_DAYS = 30 * 24 * 60 * 60 * 1000L // 30 days
     }
     fun generateToken(userId: String, role: String): String {
         return JWT.create()

@@ -5,6 +5,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("kapt") version "1.9.23"
     id("io.gitlab.arturbosch.detekt") version "1.23.6"
+    id("info.solidsoft.pitest") version "1.19.0-rc.1"
 }
 
 group = "org.voting"
@@ -36,6 +37,8 @@ dependencies {
     testImplementation("org.testcontainers:mongodb:1.18.1")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    pitest("org.pitest:pitest-junit5-plugin:1.2.1")
+
 }
 
 tasks.jar {
@@ -47,7 +50,7 @@ tasks.jar {
         )
     }
     archiveBaseName.set("user-management")
-    destinationDirectory.set(file("$buildDir/libs"))
+    destinationDirectory.set(file("${layout.buildDirectory}/libs"))
 
 }
 
@@ -66,5 +69,13 @@ detekt {
     config.setFrom("detekt.yml")
     buildUponDefaultConfig = false
     parallel = true
+}
 
+pitest {
+    targetClasses = setOf("org.voting.usermanagement.domain.*")
+    testPlugin = "junit5"
+    outputFormats = setOf("XML", "HTML")
+    verbose = true
+    mutationThreshold = 0
+    coverageThreshold = 0
 }
