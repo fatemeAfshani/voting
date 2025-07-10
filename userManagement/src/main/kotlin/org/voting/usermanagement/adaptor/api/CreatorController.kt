@@ -1,5 +1,6 @@
 package org.voting.usermanagement.adaptor.api
 
+import io.micrometer.core.instrument.MeterRegistry
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -15,11 +16,13 @@ import org.voting.usermanagement.domain.user.Roles
 @RequestMapping("/api/v1/creator")
 class CreatorController(
     private val service: CreatorService,
-    private val jwtUtil: JwtUtil
+    private val jwtUtil: JwtUtil,
+    private val meterRegistry: MeterRegistry
 ) {
     @PostMapping("/register")
     fun registerCreator(@RequestBody request: RegisterDto): ResponseEntity<String> {
         service.register(request)
+        meterRegistry.counter("register_counter", "register", "/api/v1/creator/register").increment()
         return ResponseEntity
             .ok(
                 "user has been registered successfully.",
