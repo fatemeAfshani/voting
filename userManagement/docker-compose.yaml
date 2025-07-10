@@ -6,10 +6,11 @@ services:
     volumes:
       - mongo_data:/data/db
     environment:
-    MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
-    MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     networks:
       - app_network
+      - monitoring_net
 
   user-management-app:
     build:
@@ -23,9 +24,13 @@ services:
       - mongodb
     networks:
       - app_network
+      - monitoring_net
+
 networks:
   app_network:
     driver: bridge
+  monitoring_net:
+    external: true
 
 volumes:
   mongo_data:
