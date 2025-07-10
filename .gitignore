@@ -12,3 +12,4 @@
 
 # Ignore logs  
 *.log  
+*.env
