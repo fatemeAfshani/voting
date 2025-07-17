@@ -1,6 +1,9 @@
 package org.voting.pollmanagement.adaptor.persistance.dataMapperImp
 
+import com.mongodb.DuplicateKeyException
 import org.springframework.stereotype.Component
+import org.voting.pollmanagement.adaptor.exception.Error
+import org.voting.pollmanagement.adaptor.exception.InvalidInputException
 import org.voting.pollmanagement.adaptor.persistance.mapper.PollMapper
 import org.voting.pollmanagement.adaptor.persistance.repository.MongoPollRepository
 import org.voting.pollmanagement.domain.poll.PollModel
@@ -13,8 +16,12 @@ class PollRepositoryImp(
 ) : PollRepository {
     override fun save(poll: PollModel): PollModel? {
         val entity = PollMapper.mapper.modelToEntity(poll)
-        val savedEntity = entity?.let { mongoPollRepository.save(entity) }
-        return PollMapper.mapper.entityToModel(savedEntity)
+        try {
+            val savedEntity = entity?.let { mongoPollRepository.save(entity) }
+            return PollMapper.mapper.entityToModel(savedEntity)
+        }catch (ex: DuplicateKeyException) {
+            throw InvalidInputException(Error.ErrorCodes.DUPLICATE_POLL_TITLE.name)
+        }
     }
 
     override fun findById(id: String): PollModel? {

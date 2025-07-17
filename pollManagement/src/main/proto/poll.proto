@@ -1,51 +1,74 @@
 syntax = "proto3";
-import "google/protobuf/empty.proto";
 
-option java_multiple_files = true;
-option java_package = "org.voting.poll";
-option java_outer_classname = "PollProto";
+import "annotations.proto";
 
 package pollManagement;
 
-
 service PollService {
-  rpc CreatePoll (PollRequest) returns (PollResponse);
-  rpc GetPollById (PollIdRequest) returns (PollResponse);
-  rpc GetActivePolls (google.protobuf.Empty) returns (PollListResponse);
-  rpc UpdatePoll (PollRequest) returns (PollResponse);
+  rpc createPoll(CreatePollRequest) returns (Empty){
+    option (google.api.http) = {
+      post: "/api/v1/polls"
+      body: "*"
+    };
+  };
+  rpc updatePoll(UpdatePollRequest) returns (Empty);
+  rpc addQuestion(AddQuestionRequest) returns (Empty);
+  rpc startPoll(StartPollRequest) returns (PollResponse);
+  rpc closePoll(RequestWithPollId) returns (PollResponse);
+  rpc getPollStatus(RequestWithPollId) returns (PollStatusResponse);
+  rpc payForPoll(PayForPollRequest) returns (PollResponse);
 }
 
-enum PollStatus {
-  DRAFT = 0;
-  ACTIVE = 1;
-  CLOSED = 2;
+message Empty {}
+
+message CreatePollRequest {
+  string title = 1;
+  optional string description = 2;
 }
 
-message PollRequest {
-  string creatorId = 1;
-  string title = 2;
-  string description = 3;
-  PollStatus status = 4;
-  int64 price = 5;
-  int32 maxVoters = 6;
-  map<string, string> preferences = 7;
+message UpdatePollRequest {
+  string pollId = 1;
+  optional int32 maxVoters = 2;
+  map<string, string> preferences = 3;
+}
+message AddQuestionRequest {
+  string pollId = 1;
+  string questionText = 2;
+  QuestionType questionType = 3;
+  repeated string options = 4;
+}
+message StartPollRequest {
+  string pollId = 1;
+  optional string startTime = 2;
+  optional string endTime = 3;
+}
+message RequestWithPollId {
+  string pollId = 1;
+}
+
+message PayForPollRequest {
+  string pollId = 1;
+  PaymentMode mode = 2;
 }
 
 message PollResponse {
-  string id = 1;
-  string creatorId = 2;
-  string title = 3;
-  string description = 4;
-  PollStatus status = 5;
-  int64 price = 6;
-  int32 maxVoters = 7;
-  map<string, string> preferences = 8;
+  string pollId = 1;
+  PollStatus status = 2;
 }
 
-message PollIdRequest {
-  string id = 1;
+message PollStatusResponse {
+  string pollId = 1;
+  PollStatus status = 2;
+  int32 votesCount = 3;
+  string startTime = 4;
+  string endTime = 5;
+  int32 maxVoters = 6;
 }
 
-message PollListResponse {
-  repeated PollResponse polls = 1;
+enum QuestionType {
+EXPLAIN =0;
+TWO_OPTION=1;
+MULTIPLE_CHOICE=2;
 }
+enum PollStatus { DRAFT = 0; SCHEDULED = 1; ACTIVE = 2; CLOSED = 3; }
+enum PaymentMode { PAY_BEFORE = 0; PAY_DURING = 1; PAY_LATER = 2; }
