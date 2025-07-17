@@ -1,9 +1,12 @@
 package org.voting.usermanagement.unitTests
 
+import io.micrometer.core.instrument.Counter
+import io.micrometer.core.instrument.MeterRegistry
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
+import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.http.ResponseEntity
@@ -29,13 +32,26 @@ class CreatorControllerTest {
     @Mock
     private lateinit var jwtUtil: JwtUtil
 
+    @Mock
+    private lateinit var  meterRegistry: MeterRegistry
+
+    @Mock
+    private lateinit var counter: Counter
+
     @Test
     fun `should register creator successfully`() {
         val request = RegisterDto("1234567890", "password123", "testUser")
 
+        `when`(meterRegistry.counter("register_counter", *arrayOf("register", "/api/v1/creator/register")))
+            .thenReturn(counter)
+
         val response = controller.registerCreator(request)
 
         assertEquals(ResponseEntity.ok("user has been registered successfully."), response)
+
+        verify(service).register(request)
+        verify(counter).increment()
+
     }
 
     @Test
