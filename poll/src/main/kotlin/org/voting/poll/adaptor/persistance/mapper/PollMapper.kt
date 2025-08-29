@@ -14,6 +14,7 @@ interface PollMapper {
         val mapper: PollMapper = Mappers.getMapper(PollMapper::class.java)
     }
 
+
     fun modelToEntity(model: PollModel?): Poll?
 
     fun entityToModel(entity: Poll?): PollModel?

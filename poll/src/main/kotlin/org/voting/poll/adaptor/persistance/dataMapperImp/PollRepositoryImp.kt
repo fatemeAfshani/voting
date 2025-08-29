@@ -14,10 +14,10 @@ import org.voting.poll.domain.ports.outbound.persistance.PollRepository
 class PollRepositoryImp(
     private val mongoPollRepository: MongoPollRepository
 ) : PollRepository {
-    override fun save(poll: PollModel): PollModel? {
+    override fun insert(poll: PollModel): PollModel? {
         val entity = PollMapper.mapper.modelToEntity(poll)
         try {
-            val savedEntity = entity?.let { mongoPollRepository.save(entity) }
+            val savedEntity = entity?.let { mongoPollRepository.insert(entity) }
             return PollMapper.mapper.entityToModel(savedEntity)
         }catch (ex: DuplicateKeyException) {
             throw InvalidInputException(Errors.ErrorCodes.DUPLICATE_POLL_TITLE.name)

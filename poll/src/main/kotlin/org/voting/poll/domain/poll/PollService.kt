@@ -14,7 +14,7 @@ class PollService(private val pollRepository: PollRepository) : PollUseCase {
         val (title, description, userId) =  createPollDto
         val poll = PollModel(title = title, description = description, creatorId = userId)
         // todo: check if there is unpaid poll, do not create new one
-        val createdPoll = pollRepository.save(poll) ?: throw UnknownException(Errors.ErrorCodes.UNKNOWN_ERROR.name)
+        val createdPoll = pollRepository.insert(poll) ?: throw UnknownException(Errors.ErrorCodes.UNKNOWN_ERROR.name)
         return createdPoll
     }
 }
