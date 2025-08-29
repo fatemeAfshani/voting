@@ -1,0 +1,49 @@
+name: Microservices CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'poll/**'
+      - 'user/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'poll/**'
+      - 'user/**'
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      poll: ${{ steps.filter.outputs.poll }}
+      user: ${{ steps.filter.outputs.user }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            poll: 'poll/**'
+            user: 'user/**'
+
+  poll_ci:
+    name: Poll CI
+    uses: ./.github/workflows/service-ci.yml
+    needs: changes
+    if: needs.changes.outputs.poll == 'true'
+    with:
+      service-name: 'Poll'
+      service-path: 'poll'
+
+  user_ci:
+    name: User Service CI
+    uses: ./.github/workflows/service-ci.yml
+    needs: changes
+    if: needs.changes.outputs.user == 'true'
+    with:
+      service-name: 'User'
+      service-path: 'user'
