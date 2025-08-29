@@ -38,5 +38,6 @@ class CreatorController(
             .ok(
                 CreatorResponseMapper.mapper.modelToDto(creator, token)
             )
+
     }
 }
