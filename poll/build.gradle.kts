@@ -100,7 +100,7 @@ tasks.jar {
             "Implementation-Version" to version
         )
     }
-    archiveBaseName.set("poll-management")
+    archiveBaseName.set("poll")
     destinationDirectory.set(file("${layout.buildDirectory}/libs"))
 }
 

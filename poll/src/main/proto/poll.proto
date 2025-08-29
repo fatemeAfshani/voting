@@ -2,7 +2,7 @@ syntax = "proto3";
 
 import "annotations.proto";
 
-package pollManagement;
+package poll;
 
 service PollService {
   rpc createPoll(CreatePollRequest) returns (PollResponse){
