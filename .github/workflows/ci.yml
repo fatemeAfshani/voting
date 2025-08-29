@@ -40,7 +40,7 @@ jobs:
       service-path: 'poll'
 
   user_ci:
-    name: User Service CI
+    name: User CI
     uses: ./.github/workflows/service-ci.yml
     needs: changes
     if: needs.changes.outputs.user == 'true'
