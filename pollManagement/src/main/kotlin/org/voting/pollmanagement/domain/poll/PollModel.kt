@@ -2,7 +2,8 @@ package org.voting.pollmanagement.domain.poll
 
 import org.voting.pollmanagement.domain.poll.enums.PollStatus
 import org.voting.pollmanagement.domain.poll.enums.QuestionType
-import java.util.Date
+import java.time.Instant
+import java.util.*
 
 data class PollModel(
     var id: String? = null,
@@ -13,21 +14,27 @@ data class PollModel(
     var price: Int = 0,
     var maxVoters: Int = 0,
     var version: Long = 0,
+    var startTime: Instant? = null,
+    var endTime: Instant? = null,
     var createDate: Date = Date(),
     var updatedAt: Date = Date(),
-    var questions: List<PollQuestion> = listOf(),
-    var preferences: Map<String, String>? = null
+    var questions: List<PollQuestion> = mutableListOf(),
+    var preferences: Map<String, String>? = null,
+    var votesCount: Int = 0
+
 )
 
 data class PollQuestion(
-    var questionId: String = java.util.UUID.randomUUID().toString(),
+    var questionId: String = UUID.randomUUID().toString(),
     var questionText: String,
     var questionType: QuestionType,
-    var options: List<PollOption> = listOf()
-)
+    var options: List<PollOption> = listOf(),
+    val shouldAnswer : Boolean = true,
+
+    )
 
 data class PollOption(
-    var optionId: String = java.util.UUID.randomUUID().toString(),
+    var optionId: String = UUID.randomUUID().toString(),
     var optionText: String
 )
 

@@ -6,6 +6,8 @@ plugins {
     kotlin("kapt") version "1.9.23"
     id("io.gitlab.arturbosch.detekt") version "1.23.6"
     id("com.google.protobuf") version "0.9.4"
+    id("info.solidsoft.pitest") version "1.19.0-rc.1"
+
 }
 
 group = "org.voting"
@@ -30,10 +32,17 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.6")
-
     implementation("org.mapstruct.extensions.spring:mapstruct-spring-annotations:0.1.2")
     implementation("org.mapstruct:mapstruct:$mapStructVersion")
     kapt("org.mapstruct:mapstruct-processor:$mapStructVersion")
+    implementation("com.auth0:java-jwt:4.2.1")
+    implementation("net.devh:grpc-server-spring-boot-starter:2.15.0.RELEASE")
+    implementation("net.devh:grpc-server-spring-boot-starter-transcoder:2.15.0.RELEASE")
+    implementation("io.grpc:grpc-protobuf:1.58.0")
+    implementation("io.grpc:grpc-stub:1.58.0")
+    implementation("io.grpc:grpc-kotlin-stub:1.4.0")
+    implementation("com.google.protobuf:protobuf-kotlin:3.24.4")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.testcontainers:testcontainers:$testContainerVersion")
@@ -41,13 +50,8 @@ dependencies {
     testImplementation("org.testcontainers:mongodb:$testContainerVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    pitest("org.pitest:pitest-junit5-plugin:1.2.1")
 
-    implementation("net.devh:grpc-server-spring-boot-starter:2.15.0.RELEASE")
-    implementation("io.grpc:grpc-protobuf:1.58.0")
-    implementation("io.grpc:grpc-stub:1.58.0")
-    implementation("io.grpc:grpc-kotlin-stub:1.4.0")
-    implementation("com.google.protobuf:protobuf-kotlin:3.24.4")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
 }
 
 protobuf {
@@ -119,3 +123,13 @@ detekt {
     buildUponDefaultConfig = false
     parallel = true
 }
+
+pitest {
+    targetClasses = setOf("org.voting.usermanagement.domain.*")
+    testPlugin = "junit5"
+    outputFormats = setOf("XML", "HTML")
+    verbose = true
+    mutationThreshold = 0
+    coverageThreshold = 0
+}
+
