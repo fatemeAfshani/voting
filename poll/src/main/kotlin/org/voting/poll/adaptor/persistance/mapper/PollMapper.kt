@@ -1,6 +1,7 @@
 package org.voting.poll.adaptor.persistance.mapper
 
 import org.mapstruct.Mapper
+import org.mapstruct.Mapping
 import org.mapstruct.factory.Mappers
 import org.voting.poll.adaptor.persistance.entity.Poll
 import org.voting.poll.domain.poll.PollModel
@@ -15,7 +16,9 @@ interface PollMapper {
     }
 
 
+    @Mapping(source = "id", target = "id")
     fun modelToEntity(model: PollModel?): Poll?
 
+    @Mapping(source = "id", target = "id")
     fun entityToModel(entity: Poll?): PollModel?
 }

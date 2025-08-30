@@ -19,16 +19,20 @@ import org.voting.poll.adaptor.api.GrpcController
 import org.voting.poll.adaptor.api.JwtUtil
 import org.voting.poll.adaptor.api.interceptors.UserInterceptor
 import org.voting.poll.adaptor.api.mapper.CreatePollMapper
+import org.voting.poll.adaptor.api.mapper.UpdatePollMapper
 import org.voting.poll.adaptor.persistance.repository.MongoPollRepository
+import org.voting.poll.domain.poll.PollModel
 import org.voting.poll.domain.poll.enums.PollStatus
 import org.voting.poll.domain.ports.inbound.PollUseCase
 import org.voting.poll.shared.Fixtures
 import poll.Poll
 import poll.Poll.CreatePollRequest
+import poll.Poll.UpdatePollRequest
 import poll.PollServiceGrpcKt
 import java.util.concurrent.TimeUnit
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import org.voting.poll.adaptor.persistance.entity.Poll as PollEntity
 
 @Testcontainers
 @SpringBootTest
@@ -73,6 +77,33 @@ class PollIntegrationTest {
         assertNotNull(createdPoll.id)
         val data = mongoPollRepository.findOneById(createdPoll.id!!)
         assertEquals(data?.creatorId, Fixtures.mockCreatorId)
+        assertEquals(data?.status, PollStatus.DRAFT)
+
+    }
+
+    @Test
+    fun `update poll should work via gRPC call`(): Unit = runBlocking {
+        val poll = PollEntity(creatorId = Fixtures.mockCreatorId)
+        val createdPoll = mongoPollRepository.insert(poll)
+
+
+
+        val request = UpdatePollRequest.newBuilder()
+            .setTitle("Test Poll Title")
+            .setDescription("Test Poll Description")
+            .setPollId(createdPoll.id)
+            .setMaxVoters(100)
+            .build()
+
+        pollService.updatePoll(
+            UpdatePollMapper.mapper.protoToDto(request,Fixtures.mockCreatorRole, Fixtures.mockCreatorId )
+        )
+
+        val data = mongoPollRepository.findOneById(createdPoll.id!!)
+        assertEquals(data?.creatorId, Fixtures.mockCreatorId)
+        assertEquals(data?.title, "Test Poll Title")
+        assertEquals(data?.description, "Test Poll Description")
+        assertEquals(data?.maxVoters, 100)
         assertEquals(data?.status, PollStatus.DRAFT)
 
     }

@@ -5,9 +5,12 @@ import net.devh.boot.grpc.server.service.GrpcService
 import org.voting.poll.adaptor.api.interceptors.UserInterceptor
 import org.voting.poll.adaptor.api.mapper.CreatePollMapper
 import org.voting.poll.adaptor.api.mapper.PollResponseMapper
+import org.voting.poll.adaptor.api.mapper.UpdatePollMapper
 import org.voting.poll.domain.ports.inbound.PollUseCase
 import poll.Poll.CreatePollRequest
+import poll.Poll.EmptyResponse
 import poll.Poll.PollResponse
+import poll.Poll.UpdatePollRequest
 import poll.PollServiceGrpcKt
 
 
@@ -20,6 +23,14 @@ private val pollService: PollUseCase
         val role = UserInterceptor.ROLE_KEY.get()
          val createdPoll = pollService.createPoll(CreatePollMapper.mapper.protoToDto(request, role, userId))
         return PollResponseMapper.mapper.dtoToProto(createdPoll)
+
+    }
+
+    override suspend fun updatePoll(request: UpdatePollRequest): EmptyResponse {
+        val userId = UserInterceptor.USER_ID_KEY.get()
+        val role = UserInterceptor.ROLE_KEY.get()
+        pollService.updatePoll(UpdatePollMapper.mapper.protoToDto(request, role, userId))
+        return EmptyResponse.getDefaultInstance()
 
     }
 }

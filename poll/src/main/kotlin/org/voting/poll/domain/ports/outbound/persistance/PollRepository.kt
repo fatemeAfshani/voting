@@ -5,6 +5,7 @@ import org.voting.poll.domain.poll.enums.PollStatus
 
 interface PollRepository {
     fun insert(poll: PollModel): PollModel?
+    fun save(poll: PollModel): PollModel?
     fun findById(id: String): PollModel?
     fun findByStatus(status: PollStatus): List<PollModel?>
 }

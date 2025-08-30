@@ -13,7 +13,7 @@ import poll.Poll
 
 
 @Mapper(config = MappingConfiguration::class)
-interface CreatePollMapper {
+interface CreatePollMapper: BaseMapper {
 
     companion object {
         val mapper: CreatePollMapper = Mappers.getMapper(CreatePollMapper::class.java)
@@ -23,15 +23,5 @@ interface CreatePollMapper {
     @Mapping(target = "role", expression = "java(mapRole(role))")
     fun protoToDto(proto: Poll.CreatePollRequest, role: String, userId: String): CreatePollDTO
 
-    fun mapRole(role: String): Roles {
-         try {
-           val convertedRole =  Roles.valueOf(role.uppercase())
-            if(convertedRole !== Roles.CREATOR){
-                throw ForbiddenException(Errors.ErrorCodes.FORBIDDEN.name)
-            }
-             return convertedRole
-        } catch (e: IllegalArgumentException) {
-            throw InvalidInputException(Errors.ErrorCodes.INVALID_ROLE.name)
-        }
-    }
+
 }

@@ -16,13 +16,24 @@ data class PollModel(
     var version: Long = 0,
     var startTime: Instant? = null,
     var endTime: Instant? = null,
-    var createDate: Date = Date(),
-    var updatedAt: Date = Date(),
+    var createDate: Date? = Date(),
+    var updatedAt: Date? = Date(),
     var questions: List<PollQuestion> = mutableListOf(),
     var preferences: Map<String, String>? = null,
     var votesCount: Int = 0
-
-)
+){
+    fun updateWithNewData(
+        title: String?,
+        description: String?,
+        maxVoters: Int?,
+        preferences: Map<String, String>?
+    ) {
+        this.title = title ?: this.title
+        this.description = description ?: this.description
+        this.maxVoters = maxVoters ?: this.maxVoters
+        this.preferences = preferences ?: this.preferences
+    }
+}
 
 data class PollQuestion(
     var questionId: String = UUID.randomUUID().toString(),

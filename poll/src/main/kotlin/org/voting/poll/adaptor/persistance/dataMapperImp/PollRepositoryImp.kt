@@ -24,6 +24,15 @@ class PollRepositoryImp(
         }
     }
 
+    override fun save(poll: PollModel): PollModel? {
+        val entity = PollMapper.mapper.modelToEntity(poll)
+        try {
+            val savedEntity = entity?.let { mongoPollRepository.save(entity) }
+            return PollMapper.mapper.entityToModel(savedEntity)
+        }catch (ex: DuplicateKeyException) {
+            throw InvalidInputException(Errors.ErrorCodes.DUPLICATE_POLL_TITLE.name)
+        }
+    }
     override fun findById(id: String): PollModel? {
         val entity = mongoPollRepository.findOneById(id)
         return PollMapper.mapper.entityToModel(entity)
