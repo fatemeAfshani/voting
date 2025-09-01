@@ -22,6 +22,7 @@ class CreatorController(
     @PostMapping("/register")
     fun registerCreator(@RequestBody request: RegisterDto): ResponseEntity<CreatorLoginResponse> {
         val creator = service.register(request)
+        //todo: also accept telegramId
         meterRegistry.counter("register_counter", "register", "/api/v1/creator/register").increment()
         val token = jwtUtil.generateToken(creator.id!!, Roles.CREATOR.name)
         return ResponseEntity
@@ -41,4 +42,6 @@ class CreatorController(
             )
 
     }
+
+    //todo: add another login endpoint for telegram users to get telegramid and return token
 }
