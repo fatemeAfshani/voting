@@ -11,10 +11,11 @@ import org.voting.user.domain.ports.inbound.CreatorUseCase
 class CreatorService(
     private val creatorRepositoryImp: CreatorRepositoryImp
 ) : CreatorUseCase {
-    override fun register(registerDto: RegisterDto) {
+    override fun register(registerDto: RegisterDto): CreatorModel {
         val (phone, password, userName) = registerDto
         val model = CreatorModel(phone = phone, password = password, userName = userName)
-        creatorRepositoryImp.save(model)
+        val creator = creatorRepositoryImp.save(model)
+        return creator
     }
 
     override fun login(registerDto: RegisterDto): CreatorModel {

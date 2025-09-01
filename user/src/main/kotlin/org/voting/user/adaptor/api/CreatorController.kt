@@ -20,12 +20,13 @@ class CreatorController(
     private val meterRegistry: MeterRegistry
 ) {
     @PostMapping("/register")
-    fun registerCreator(@RequestBody request: RegisterDto): ResponseEntity<String> {
-        service.register(request)
+    fun registerCreator(@RequestBody request: RegisterDto): ResponseEntity<CreatorLoginResponse> {
+        val creator = service.register(request)
         meterRegistry.counter("register_counter", "register", "/api/v1/creator/register").increment()
+        val token = jwtUtil.generateToken(creator.id!!, Roles.CREATOR.name)
         return ResponseEntity
             .ok(
-                "user has been registered successfully.",
+                CreatorResponseMapper.mapper.modelToDto(creator, token)
             )
     }
 

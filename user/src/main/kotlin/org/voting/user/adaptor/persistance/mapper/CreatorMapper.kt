@@ -14,7 +14,7 @@ interface CreatorMapper {
         val mapper: CreatorMapper = Mappers.getMapper(CreatorMapper::class.java)
     }
 
-    fun modelToEntity(model: CreatorModel?): Creator?
+    fun modelToEntity(model: CreatorModel): Creator
 
-    fun entityToModel(entity: Creator?): CreatorModel?
+    fun entityToModel(entity: Creator): CreatorModel
 }

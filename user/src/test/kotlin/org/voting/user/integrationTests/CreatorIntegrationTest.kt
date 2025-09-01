@@ -66,7 +66,7 @@ class CreatorIntegrationTest {
                 .content(registerJson)
         )
             .andExpect(status().isOk)
-            .andExpect(content().string("user has been registered successfully."))
+            .andExpect(jsonPath("$.token").exists())
     }
 
     @Test

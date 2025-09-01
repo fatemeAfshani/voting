@@ -41,14 +41,17 @@ class CreatorControllerTest {
     @Test
     fun `should register creator successfully`() {
         val request = RegisterDto("1234567890", "password123", "testUser")
+        val creator = CreatorModel(id = "1", phone = "1234567890", password = "password123", userName = "testUser")
+        val token = "mockToken"
 
+        `when`(service.register(request)).thenReturn(creator)
         `when`(meterRegistry.counter("register_counter", *arrayOf("register", "/api/v1/creator/register")))
             .thenReturn(counter)
-
+        `when`(jwtUtil.generateToken(creator.id!!, Roles.CREATOR.name)).thenReturn(token)
         val response = controller.registerCreator(request)
 
-        assertEquals(ResponseEntity.ok("user has been registered successfully."), response)
-
+        assertNotNull(response.body)
+        assertEquals(token, response.body!!.token)
         verify(service).register(request)
         verify(counter).increment()
 

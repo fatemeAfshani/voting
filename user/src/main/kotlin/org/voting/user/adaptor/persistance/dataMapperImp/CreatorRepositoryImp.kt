@@ -15,9 +15,10 @@ class CreatorRepositoryImp(
         return CreatorMapper.mapper.entityToModel(entity)
     }
 
-    override fun save(creator: CreatorModel) {
+    override fun save(creator: CreatorModel): CreatorModel {
         val entity = CreatorMapper.mapper.modelToEntity(creator)
-        entity?.let { mongoCreatorRepository.save(it) }
+        val savedEntity = mongoCreatorRepository.save(entity)
+        return CreatorMapper.mapper.entityToModel(savedEntity)
     }
 
     override fun findByPhoneNumber(phoneNumber: String): CreatorModel? {
