@@ -126,7 +126,7 @@ detekt {
 }
 
 pitest {
-    targetClasses = setOf("org.voting.usermanagement.domain.*")
+    targetClasses = setOf("org.voting.poll.domain.*")
     testPlugin = "junit5"
     outputFormats = setOf("XML", "HTML")
     verbose = true
