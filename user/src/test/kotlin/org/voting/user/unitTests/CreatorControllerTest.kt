@@ -10,7 +10,7 @@ import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.http.ResponseEntity
-import org.voting.user.adaptor.api.CreatorController
+import org.voting.user.adaptor.api.http.CreatorController
 import org.voting.user.adaptor.api.JwtUtil
 import org.voting.user.adaptor.api.dto.CreatorLoginResponse
 import org.voting.user.domain.creator.CreatorModel
