@@ -38,6 +38,7 @@ message AddQuestionRequest {
   string questionText = 2;
   QuestionType questionType = 3;
   repeated string options = 4;
+  bool shouldAnswer = 5;
 }
 message StartPollRequest {
   string pollId = 1;

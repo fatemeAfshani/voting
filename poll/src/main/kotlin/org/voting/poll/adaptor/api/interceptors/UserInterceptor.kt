@@ -7,9 +7,9 @@ import io.grpc.ServerCall
 import io.grpc.ServerCallHandler
 import io.grpc.ServerInterceptor
 import net.devh.boot.grpc.server.interceptor.GrpcGlobalServerInterceptor
-import org.voting.poll.adaptor.exception.ForbiddenException
 import org.voting.poll.adaptor.api.JwtUtil
 import org.voting.poll.adaptor.exception.Errors
+import org.voting.poll.adaptor.exception.ForbiddenException
 
 @GrpcGlobalServerInterceptor
 class UserInterceptor(
@@ -24,7 +24,7 @@ class UserInterceptor(
         headers: Metadata,
         next: ServerCallHandler<ReqT, RespT>
     ): ServerCall.Listener<ReqT> {
-            println("Received call to ${call.methodDescriptor.fullMethodName}")
+        println("Received call to ${call.methodDescriptor.fullMethodName}")
 
         val authHeader = headers.get(Metadata.Key.of("authorization", Metadata.ASCII_STRING_MARSHALLER))
 
@@ -42,12 +42,14 @@ class UserInterceptor(
                     .withValue(ROLE_KEY, role)
 
                 return Contexts.interceptCall(ctx, call, headers, next)
-
             } catch (e: Exception) {
                 throw ForbiddenException(Errors.ErrorCodes.UNAUTHORIZED.name)
             }
         }
+        val ctx = Context.current()
+            .withValue(USER_ID_KEY, "")
+            .withValue(ROLE_KEY, "")
 
-        throw ForbiddenException(Errors.ErrorCodes.UNAUTHORIZED.name)
+        return Contexts.interceptCall(ctx, call, headers, next)
     }
 }
