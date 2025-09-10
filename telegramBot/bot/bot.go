@@ -27,12 +27,14 @@ func NewTelegramBot(botToken, apiURL string) (*TelegramBot, error) {
 }
 
 func (t *TelegramBot) Start() {
+	//todo due to documentation we should put offset = UpdateId + 1
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
 
 	updates := t.bot.GetUpdatesChan(u)
 	log.Println("Bot started.")
 
+	//todo write this data into queue for scalability
 	for update := range updates {
 		if update.Message == nil {
 			continue
