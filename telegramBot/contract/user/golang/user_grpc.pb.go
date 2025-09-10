@@ -19,16 +19,16 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	UserService_SignIn_FullMethodName = "/auth.UserService/SignIn"
-	UserService_SignUp_FullMethodName = "/auth.UserService/SignUp"
+	UserService_LoginWithTelegram_FullMethodName = "/auth.UserService/LoginWithTelegram"
+	UserService_Register_FullMethodName          = "/auth.UserService/Register"
 )
 
 // UserServiceClient is the client API for UserService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserServiceClient interface {
-	SignIn(ctx context.Context, in *SignInRequest, opts ...grpc.CallOption) (*SignInResponse, error)
-	SignUp(ctx context.Context, in *SignUpRequest, opts ...grpc.CallOption) (*SignUpResponse, error)
+	LoginWithTelegram(ctx context.Context, in *TelegramLoginRequest, opts ...grpc.CallOption) (*CreatorLoginResponse, error)
+	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*CreatorLoginResponse, error)
 }
 
 type userServiceClient struct {
@@ -39,20 +39,20 @@ func NewUserServiceClient(cc grpc.ClientConnInterface) UserServiceClient {
 	return &userServiceClient{cc}
 }
 
-func (c *userServiceClient) SignIn(ctx context.Context, in *SignInRequest, opts ...grpc.CallOption) (*SignInResponse, error) {
+func (c *userServiceClient) LoginWithTelegram(ctx context.Context, in *TelegramLoginRequest, opts ...grpc.CallOption) (*CreatorLoginResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(SignInResponse)
-	err := c.cc.Invoke(ctx, UserService_SignIn_FullMethodName, in, out, cOpts...)
+	out := new(CreatorLoginResponse)
+	err := c.cc.Invoke(ctx, UserService_LoginWithTelegram_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userServiceClient) SignUp(ctx context.Context, in *SignUpRequest, opts ...grpc.CallOption) (*SignUpResponse, error) {
+func (c *userServiceClient) Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*CreatorLoginResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(SignUpResponse)
-	err := c.cc.Invoke(ctx, UserService_SignUp_FullMethodName, in, out, cOpts...)
+	out := new(CreatorLoginResponse)
+	err := c.cc.Invoke(ctx, UserService_Register_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -63,8 +63,8 @@ func (c *userServiceClient) SignUp(ctx context.Context, in *SignUpRequest, opts 
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
 type UserServiceServer interface {
-	SignIn(context.Context, *SignInRequest) (*SignInResponse, error)
-	SignUp(context.Context, *SignUpRequest) (*SignUpResponse, error)
+	LoginWithTelegram(context.Context, *TelegramLoginRequest) (*CreatorLoginResponse, error)
+	Register(context.Context, *RegisterRequest) (*CreatorLoginResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -75,11 +75,11 @@ type UserServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedUserServiceServer struct{}
 
-func (UnimplementedUserServiceServer) SignIn(context.Context, *SignInRequest) (*SignInResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SignIn not implemented")
+func (UnimplementedUserServiceServer) LoginWithTelegram(context.Context, *TelegramLoginRequest) (*CreatorLoginResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LoginWithTelegram not implemented")
 }
-func (UnimplementedUserServiceServer) SignUp(context.Context, *SignUpRequest) (*SignUpResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SignUp not implemented")
+func (UnimplementedUserServiceServer) Register(context.Context, *RegisterRequest) (*CreatorLoginResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 func (UnimplementedUserServiceServer) testEmbeddedByValue()                     {}
@@ -102,38 +102,38 @@ func RegisterUserServiceServer(s grpc.ServiceRegistrar, srv UserServiceServer) {
 	s.RegisterService(&UserService_ServiceDesc, srv)
 }
 
-func _UserService_SignIn_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SignInRequest)
+func _UserService_LoginWithTelegram_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TelegramLoginRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).SignIn(ctx, in)
+		return srv.(UserServiceServer).LoginWithTelegram(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: UserService_SignIn_FullMethodName,
+		FullMethod: UserService_LoginWithTelegram_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).SignIn(ctx, req.(*SignInRequest))
+		return srv.(UserServiceServer).LoginWithTelegram(ctx, req.(*TelegramLoginRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_SignUp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SignUpRequest)
+func _UserService_Register_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegisterRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).SignUp(ctx, in)
+		return srv.(UserServiceServer).Register(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: UserService_SignUp_FullMethodName,
+		FullMethod: UserService_Register_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).SignUp(ctx, req.(*SignUpRequest))
+		return srv.(UserServiceServer).Register(ctx, req.(*RegisterRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -146,12 +146,12 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*UserServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "SignIn",
-			Handler:    _UserService_SignIn_Handler,
+			MethodName: "LoginWithTelegram",
+			Handler:    _UserService_LoginWithTelegram_Handler,
 		},
 		{
-			MethodName: "SignUp",
-			Handler:    _UserService_SignUp_Handler,
+			MethodName: "Register",
+			Handler:    _UserService_Register_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

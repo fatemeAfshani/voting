@@ -24,11 +24,11 @@ func New(conn *grpc.ClientConn) *Client {
 func (c *Client) SignIn(ctx context.Context, request SignInRequest) (SignInResponse, error) {
 	client := golang.NewUserServiceClient(c.Conn)
 
-	req := &golang.SignInRequest{
+	req := &golang.TelegramLoginRequest{
 		TelegramId: request.TelegramId,
 	}
 
-	res, err := client.SignIn(ctx, req)
+	res, err := client.LoginWithTelegram(ctx, req)
 	if err != nil || res == nil {
 		return SignInResponse{}, err
 	}
@@ -42,13 +42,13 @@ func (c *Client) SignIn(ctx context.Context, request SignInRequest) (SignInRespo
 func (c *Client) SignUp(ctx context.Context, request SignUpRequest) (SignUpResponse, error) {
 	client := golang.NewUserServiceClient(c.Conn)
 
-	req := &golang.SignUpRequest{
+	req := &golang.RegisterRequest{
 		TelegramId: request.TelegramId,
 		Phone:      request.Phone,
 		Password:   request.Password,
 	}
 
-	res, err := client.SignUp(ctx, req)
+	res, err := client.Register(ctx, req)
 	if err != nil || res == nil {
 		return SignUpResponse{}, err
 	}
