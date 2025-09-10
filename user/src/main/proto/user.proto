@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package user;
+
+service CreatorService {
+  rpc Register(RegisterRequest) returns (CreatorLoginResponse);
+  rpc Login(RegisterRequest) returns (CreatorLoginResponse);
+  rpc LoginWithTelegram(TelegramLoginRequest) returns (CreatorLoginResponse);
+}
+
+message RegisterRequest {
+  string phone = 1;
+  string password = 2;
+  string telegramId = 3;
+}
+
+message TelegramLoginRequest {
+  string telegramId = 1;
+}
+
+message CreatorLoginResponse {
+  string id = 1;
+  string token = 2;
+}
+
+
