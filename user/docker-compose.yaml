@@ -12,7 +12,7 @@ services:
       - app_network
       - monitoring_net
 
-  user-management-app:
+  user-app:
     build:
       context: .
       dockerfile: Dockerfile

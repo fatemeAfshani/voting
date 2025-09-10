@@ -12,8 +12,8 @@ class CreatorService(
     private val creatorRepositoryImp: CreatorRepositoryImp
 ) : CreatorUseCase {
     override fun register(registerDto: RegisterDto): CreatorModel {
-        val (phone, password, userName) = registerDto
-        val model = CreatorModel(phone = phone, password = password, userName = userName)
+        val (phone, password, telegramId) = registerDto
+        val model = CreatorModel(phone = phone, password = password, telegramId = telegramId)
         val creator = creatorRepositoryImp.save(model)
         return creator
     }
@@ -26,4 +26,11 @@ class CreatorService(
         }
         return creator
     }
+
+    override fun loginWithTelegram(telegramId: String): CreatorModel {
+        val creator = creatorRepositoryImp.findByTelegramId(telegramId)
+            ?: throw NotFoundException(Error.ErrorCodes.USER_NOT_FOUND.name)
+        return creator
+    }
+
 }

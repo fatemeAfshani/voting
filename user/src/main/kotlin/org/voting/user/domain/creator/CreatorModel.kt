@@ -12,4 +12,5 @@ data class CreatorModel(
     val userName: String? = null,
     var password: String? = null,
     var company: String? = null,
+    var telegramId: String? = null
 )

@@ -7,4 +7,6 @@ interface CreatorRepositoryInterface {
 
     fun save(creator: CreatorModel): CreatorModel
     fun findByPhoneNumber(phoneNumber: String): CreatorModel?
+
+    fun findByTelegramId(telegramId: String): CreatorModel?
 }

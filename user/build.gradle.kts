@@ -50,7 +50,7 @@ tasks.jar {
             "Implementation-Version" to version
         )
     }
-    archiveBaseName.set("user-management")
+    archiveBaseName.set("user")
     destinationDirectory.set(file("${layout.buildDirectory}/libs"))
 
 }
@@ -73,7 +73,7 @@ detekt {
 }
 
 pitest {
-    targetClasses = setOf("org.voting.usermanagement.domain.*")
+    targetClasses = setOf("org.voting.user.domain.*")
     testPlugin = "junit5"
     outputFormats = setOf("XML", "HTML")
     verbose = true

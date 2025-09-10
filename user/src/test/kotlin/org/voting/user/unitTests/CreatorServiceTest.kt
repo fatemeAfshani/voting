@@ -30,7 +30,7 @@ class CreatorServiceTest {
     @Test
     fun `should login creator successfully`() {
         val request = RegisterDto("1234567890", "password123")
-        val creator = CreatorModel(id = "1", phone = "1234567890", password = "password123", userName = "testUser")
+        val creator = CreatorModel(id = "1", phone = "1234567890", password = "password123", telegramId = "testUser")
 
         `when`(creatorRepositoryImp.findByPhoneNumber("1234567890")).thenReturn(creator)
 

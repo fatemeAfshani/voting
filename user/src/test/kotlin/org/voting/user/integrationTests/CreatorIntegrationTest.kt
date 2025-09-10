@@ -11,12 +11,12 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.testcontainers.containers.MongoDBContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.voting.user.adaptor.persistance.repository.MongoCreatorRepository
-
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
@@ -42,24 +42,17 @@ class CreatorIntegrationTest {
         }
     }
 
-    private val registerJson = """
-        {
-            "phone": "1234567890",
-            "password": "password123",
-            "userName": "testUser"
-        }
-    """.trimIndent()
-
-    private val loginJson = """
-        {
-            "phone": "1234567890",
-            "password": "password123"
-        }
-    """.trimIndent()
-
     @Test
     @Order(1)
     fun `should register creator successfully`() {
+        val registerJson = """
+        {
+            "phone": "1234567890",
+            "password": "password123",
+            "telegramId": "testUser"
+        }
+        """.trimIndent()
+
         mockMvc.perform(
             post("/api/v1/creator/register")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -72,8 +65,33 @@ class CreatorIntegrationTest {
     @Test
     @Order(2)
     fun `should login creator and return token`() {
+        val loginJson = """
+        {
+            "phone": "1234567890",
+            "password": "password123"
+        }
+        """.trimIndent()
+
         mockMvc.perform(
             post("/api/v1/creator/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(loginJson)
+        )
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.token").exists())
+    }
+
+    @Test
+    @Order(2)
+    fun `should login creator with telegramId and return token`() {
+        val loginJson = """
+        {
+            "telegramId": "testUser"
+        }
+        """.trimIndent()
+
+        mockMvc.perform(
+            post("/api/v1/creator/login-telegram")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(loginJson)
         )
