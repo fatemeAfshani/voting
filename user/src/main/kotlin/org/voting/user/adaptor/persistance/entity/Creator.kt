@@ -23,4 +23,6 @@ data class Creator(
     var phone: String? = null,
     var password: String? = null,
     var company: String? = null,
+    @Indexed
+    var telegramId: String? = null,
 )

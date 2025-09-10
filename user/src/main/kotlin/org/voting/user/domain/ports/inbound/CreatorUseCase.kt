@@ -6,4 +6,6 @@ import org.voting.user.domain.creator.dto.RegisterDto
 interface CreatorUseCase {
     fun register(registerDto: RegisterDto): CreatorModel
     fun login(registerDto: RegisterDto): CreatorModel
+
+    fun loginWithTelegram(telegramId: String): CreatorModel
 }
