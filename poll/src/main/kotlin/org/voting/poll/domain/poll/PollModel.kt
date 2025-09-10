@@ -21,7 +21,7 @@ data class PollModel(
     var questions: List<PollQuestion> = mutableListOf(),
     var preferences: Map<String, String>? = null,
     var votesCount: Int = 0
-){
+) {
     fun updateWithNewData(
         title: String?,
         description: String?,
@@ -40,12 +40,11 @@ data class PollQuestion(
     var questionText: String,
     var questionType: QuestionType,
     var options: List<PollOption> = listOf(),
-    val shouldAnswer : Boolean = true,
+    val shouldAnswer: Boolean = true,
 
-    )
+)
 
 data class PollOption(
     var optionId: String = UUID.randomUUID().toString(),
     var optionText: String
 )
-
