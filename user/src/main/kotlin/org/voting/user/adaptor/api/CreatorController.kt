@@ -43,7 +43,7 @@ class CreatorController(
 
     }
 
-    @PostMapping("/login/telegram")
+    @PostMapping("/login-telegram")
     fun loginWithTelegram(@RequestBody request: TelegramLoginRequest): ResponseEntity<CreatorLoginResponse> {
         val creator = service.loginWithTelegram(request.telegramId)
         val token = jwtUtil.generateToken(creator.id!!, Roles.CREATOR.name)

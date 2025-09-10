@@ -16,6 +16,7 @@ import org.voting.user.adaptor.api.dto.CreatorLoginResponse
 import org.voting.user.domain.creator.CreatorModel
 import org.voting.user.domain.creator.CreatorService
 import org.voting.user.domain.creator.dto.RegisterDto
+import org.voting.user.domain.creator.dto.TelegramLoginRequest
 import org.voting.user.domain.user.Roles
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -41,7 +42,7 @@ class CreatorControllerTest {
     @Test
     fun `should register creator successfully`() {
         val request = RegisterDto("1234567890", "password123", "testUser")
-        val creator = CreatorModel(id = "1", phone = "1234567890", password = "password123", userName = "testUser")
+        val creator = CreatorModel(id = "1", phone = "1234567890", password = "password123", telegramId = "testUser")
         val token = "mockToken"
 
         `when`(service.register(request)).thenReturn(creator)
@@ -60,13 +61,29 @@ class CreatorControllerTest {
     @Test
     fun `should login creator and return token`() {
         val request = RegisterDto("1234567890", "password123")
-        val creator = CreatorModel(id = "1", phone = "1234567890", password = "password123", userName = "testUser")
+        val creator = CreatorModel(id = "1", phone = "1234567890", password = "password123", telegramId = "testUser")
         val token = "mockToken"
 
         `when`(service.login(request)).thenReturn(creator)
         `when`(jwtUtil.generateToken(creator.id!!, Roles.CREATOR.name)).thenReturn(token)
 
         val response: ResponseEntity<CreatorLoginResponse> = controller.loginCreator(request)
+
+        assertNotNull(response.body)
+        assertEquals(token, response.body!!.token)
+    }
+
+    @Test
+    fun `should login creator with telegramId and return token`() {
+        val telegramId = "sampleUser"
+        val creator = CreatorModel(id = "1", phone = "1234567890", password = "password123", telegramId = "testUser")
+        val token = "mockToken"
+        val request = TelegramLoginRequest(telegramId)
+
+        `when`(service.loginWithTelegram(telegramId)).thenReturn(creator)
+        `when`(jwtUtil.generateToken(creator.id!!, Roles.CREATOR.name)).thenReturn(token)
+
+        val response: ResponseEntity<CreatorLoginResponse> = controller.loginWithTelegram(request)
 
         assertNotNull(response.body)
         assertEquals(token, response.body!!.token)
