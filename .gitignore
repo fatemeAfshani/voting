@@ -6,7 +6,7 @@
 *.sublime-project  
 
 # Ignore build directories  
-/build/  
+**/build/
 **/target/  
 **/dist/
 # Ignore logs  
