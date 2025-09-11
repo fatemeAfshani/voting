@@ -1,4 +1,4 @@
-package user_api
+package userapi
 
 type SignInRequest struct {
 	TelegramId string
