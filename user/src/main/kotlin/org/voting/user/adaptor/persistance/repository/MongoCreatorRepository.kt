@@ -9,6 +9,6 @@ interface MongoCreatorRepository : MongoRepository<Creator, ObjectId> {
 
     fun save(creator: Creator): Creator
 
-    fun findFirstByPhone(phoneNumber: String): Creator
-    fun findFirstByTelegramId(telegramId: String): Creator
+    fun findFirstByPhone(phoneNumber: String): Creator?
+    fun findFirstByTelegramId(telegramId: String): Creator?
 }

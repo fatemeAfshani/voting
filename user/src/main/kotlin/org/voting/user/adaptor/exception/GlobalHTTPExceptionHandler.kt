@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 
 @ControllerAdvice
-class GlobalExceptionHandler(
+class GlobalHTTPExceptionHandler(
     private val logger: Logger,
 ) {
     @ExceptionHandler(GeneralException::class)
@@ -16,7 +16,7 @@ class GlobalExceptionHandler(
         return ResponseEntity(
             mapOf(
                 "error" to (ex.message ?: "An unexpected error occurred"),
-                "faMessage" to (Error.ErrorMessages[ex.message] ?: "An unexpected error occurred"),
+                "faMessage" to (Errors.ErrorMessages[ex.message] ?: "An unexpected error occurred"),
                 "status" to ex.statusCode
             ),
             HttpStatus.valueOf(ex.statusCode)
@@ -30,7 +30,7 @@ class GlobalExceptionHandler(
             mapOf(
                 "error" to "Internal Server Error",
                 "status" to 500,
-                "faMessage" to (Error.ErrorMessages[Error.ErrorCodes.UNKNOWN_ERROR.name] ?: "خطای ناشناخته"),
+                "faMessage" to (Errors.ErrorMessages[Errors.ErrorCodes.UNKNOWN_ERROR.name] ?: "خطای ناشناخته"),
             ),
             HttpStatus.INTERNAL_SERVER_ERROR
         )
