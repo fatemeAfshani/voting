@@ -16,19 +16,21 @@ interface UpdateVoterProfileMapper : BaseMapper {
 
     @Mapping(source = "userId", target = "userId")
     @Mapping(target = "userRole", expression = "java(mapRole(userRole))")
+    @Mapping(source = "proto.city", target = "city")
+    @Mapping(source = "proto.age", target = "age")
+    @Mapping(source = "proto.job", target = "job")
+    @Mapping(source = "proto.fieldOfStudy", target = "fieldOfStudy")
     @Mapping(
         target = "gender",
-        expression = "java(org.voting.user.adaptor.api.mapper.EnumValidators.mapGenderStrict(proto.getGender()))"
+        expression = "java(org.voting.user.adaptor.api.mapper.EnumValidators.mapGenderOptional(proto))"
     )
     @Mapping(
         target = "educationLevel",
-        expression =
-        "java(org.voting.user.adaptor.api.mapper.EnumValidators.mapEducationLevelStrict(proto.getEducationLevel()))"
+        expression = "java(org.voting.user.adaptor.api.mapper.EnumValidators.mapEducationLevelOptional(proto))"
     )
     @Mapping(
         target = "maritalStatus",
-        expression =
-        "java(org.voting.user.adaptor.api.mapper.EnumValidators.mapMaritalStatusStrict(proto.getMaritalStatus()))"
+        expression = "java(org.voting.user.adaptor.api.mapper.EnumValidators.mapMaritalStatusOptional(proto))"
     )
     fun protoToDto(proto: User.UpdateVoterProfileRequest, userId: String, userRole: String): UpdateProfileDto
 }

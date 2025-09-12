@@ -9,7 +9,7 @@ interface BaseMapper {
     fun mapRole(role: String): Roles {
         try {
             val convertedRole = Roles.valueOf(role.uppercase())
-            if (convertedRole !== Roles.CREATOR) {
+            if (convertedRole !== Roles.CREATOR && convertedRole !== Roles.VOTER) {
                 throw ForbiddenException(Errors.ErrorCodes.FORBIDDEN.name)
             }
             return convertedRole

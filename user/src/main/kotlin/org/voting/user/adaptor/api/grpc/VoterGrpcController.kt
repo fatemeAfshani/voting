@@ -5,6 +5,7 @@ import org.voting.user.adaptor.api.JwtUtil
 import org.voting.user.adaptor.api.interceptors.UserInterceptor
 import org.voting.user.adaptor.api.mapper.UpdateVoterProfileMapper
 import org.voting.user.domain.ports.inbound.VoterUseCase
+import org.voting.user.domain.user.Roles
 import user.User
 import user.User.EmptyResponse
 import user.User.VoterLoginResponse
@@ -18,7 +19,7 @@ class VoterGrpcController(
 
     override suspend fun loginWithTelegram(request: User.TelegramLoginRequest): VoterLoginResponse {
         val voter = voterService.loginWithTelegram(request.telegramId)
-        val token = jwtUtil.generateToken(voter.id!!, org.voting.user.domain.user.Roles.VOTER.name)
+        val token = jwtUtil.generateToken(voter.id!!, Roles.VOTER.name)
 
         return VoterLoginResponse.newBuilder()
             .setId(voter.id)
@@ -28,9 +29,9 @@ class VoterGrpcController(
 
     override suspend fun updateProfile(request: User.UpdateVoterProfileRequest): EmptyResponse {
         val userId = UserInterceptor.USER_ID_KEY.get()
-        val role = org.voting.user.domain.user.Roles.VOTER.name
+        val role = UserInterceptor.ROLE_KEY.get()
 
-         voterService.updateProfile(UpdateVoterProfileMapper.mapper.protoToDto(request, userId, role))
+        voterService.updateProfile(UpdateVoterProfileMapper.mapper.protoToDto(request, userId, role))
         return EmptyResponse.newBuilder().build()
     }
 }

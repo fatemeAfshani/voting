@@ -18,6 +18,15 @@ object EnumValidators {
     }
 
     @JvmStatic
+    fun mapGenderOptional(proto: User.UpdateVoterProfileRequest): Genders? {
+        return if (proto.hasGender()) {
+            mapGenderStrict(proto.gender)
+        } else {
+            null
+        }
+    }
+
+    @JvmStatic
     fun mapEducationLevelStrict(type: User.EducationLevels): EducationLevels {
         return when (type) {
             User.EducationLevels.STUDENT -> EducationLevels.STUDENT
@@ -31,12 +40,30 @@ object EnumValidators {
     }
 
     @JvmStatic
+    fun mapEducationLevelOptional(proto: User.UpdateVoterProfileRequest): EducationLevels? {
+        return if (proto.hasEducationLevel()) {
+            mapEducationLevelStrict(proto.educationLevel)
+        } else {
+            null
+        }
+    }
+
+    @JvmStatic
     fun mapMaritalStatusStrict(type: User.MaritalStatuses): MaritalStatuses {
         return when (type) {
             User.MaritalStatuses.MARRIED -> MaritalStatuses.MARRIED
             User.MaritalStatuses.SINGLE -> MaritalStatuses.SINGLE
             User.MaritalStatuses.UNRECOGNIZED ->
                 throw InvalidException(Errors.ErrorCodes.MARITAL_STATUS_IS_INVALID.name)
+        }
+    }
+
+    @JvmStatic
+    fun mapMaritalStatusOptional(proto: User.UpdateVoterProfileRequest): MaritalStatuses? {
+        return if (proto.hasMaritalStatus()) {
+            mapMaritalStatusStrict(proto.maritalStatus)
+        } else {
+            null
         }
     }
 }
