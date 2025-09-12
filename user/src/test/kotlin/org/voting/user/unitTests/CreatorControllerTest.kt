@@ -10,9 +10,9 @@ import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.http.ResponseEntity
-import org.voting.user.adaptor.api.http.CreatorController
 import org.voting.user.adaptor.api.JwtUtil
 import org.voting.user.adaptor.api.dto.CreatorLoginResponse
+import org.voting.user.adaptor.api.http.CreatorController
 import org.voting.user.domain.creator.CreatorModel
 import org.voting.user.domain.creator.CreatorService
 import org.voting.user.domain.creator.dto.RegisterDto
@@ -34,7 +34,7 @@ class CreatorControllerTest {
     private lateinit var jwtUtil: JwtUtil
 
     @Mock
-    private lateinit var  meterRegistry: MeterRegistry
+    private lateinit var meterRegistry: MeterRegistry
 
     @Mock
     private lateinit var counter: Counter
@@ -55,7 +55,6 @@ class CreatorControllerTest {
         assertEquals(token, response.body!!.token)
         verify(service).register(request)
         verify(counter).increment()
-
     }
 
     @Test

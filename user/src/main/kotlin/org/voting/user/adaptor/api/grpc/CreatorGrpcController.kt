@@ -11,7 +11,7 @@ import user.User.RegisterRequest
 import user.User.TelegramLoginRequest
 
 @GrpcService
-class GrpcController(
+class CreatorGrpcController(
     private val service: CreatorUseCase,
     private val jwtUtil: JwtUtil,
 ) : CreatorServiceGrpcKt.CreatorServiceCoroutineImplBase() {

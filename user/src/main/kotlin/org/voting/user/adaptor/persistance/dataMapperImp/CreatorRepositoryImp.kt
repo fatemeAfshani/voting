@@ -23,12 +23,11 @@ class CreatorRepositoryImp(
 
     override fun findByPhoneNumber(phoneNumber: String): CreatorModel? {
         val entity = mongoCreatorRepository.findFirstByPhone(phoneNumber)
-        return CreatorMapper.mapper.entityToModel(entity)
+        return entity?.let { CreatorMapper.mapper.entityToModel(it) }
     }
 
     override fun findByTelegramId(telegramId: String): CreatorModel? {
         val entity = mongoCreatorRepository.findFirstByTelegramId(telegramId)
-        return CreatorMapper.mapper.entityToModel(entity)
+        return entity?.let { CreatorMapper.mapper.entityToModel(it) }
     }
-
 }

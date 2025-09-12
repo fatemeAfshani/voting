@@ -1,6 +1,6 @@
 package org.voting.user.adaptor.exception
 
-object Error {
+object Errors {
     enum class ErrorCodes {
         UNAUTHORIZED,
         FORBIDDEN,
