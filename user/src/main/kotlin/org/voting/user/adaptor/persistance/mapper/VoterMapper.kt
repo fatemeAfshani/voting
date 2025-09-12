@@ -13,5 +13,6 @@ interface VoterMapper {
     }
 
     fun entityToModel(entity: Voter): VoterModel
+
     fun modelToEntity(model: VoterModel): Voter
 }
