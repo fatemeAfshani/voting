@@ -1,8 +1,8 @@
-package user_api
+package userapi
 
 import (
 	"context"
-	"github.com/yourname/telegram-bot/contract/user/golang"
+	"github.com/fatemeAfshani/voting/contract/user/golang"
 	"google.golang.org/grpc"
 )
 
