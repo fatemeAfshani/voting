@@ -44,6 +44,8 @@ func Setup(Conn *grpc.ClientConn, cfg config.Config) (Application, error) {
 }
 
 func (app Application) Start() error {
+	ctx, ctxCancel := context.WithCancel(context.Background())
+
 	logger := log.Get()
 	logger.Info().Msg("Starting application...")
 
@@ -52,10 +54,11 @@ func (app Application) Start() error {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	app.startServer(&wg)
+	app.startServer(ctx, &wg)
 
 	<-ctx.Done()
 	logger.Info().Msg("Shutdown signal received...")
+	ctxCancel()
 
 	shutdownTimeoutCtx, cancel := context.WithTimeout(context.Background(), app.Config.TotalShutdownTimeout)
 	defer cancel()
@@ -70,14 +73,14 @@ func (app Application) Start() error {
 	return nil
 }
 
-func (app Application) startServer(wg *sync.WaitGroup) {
+func (app Application) startServer(ctx context.Context, wg *sync.WaitGroup) {
 	logger := log.Get()
 	wg.Add(1)
 
 	go func() {
 		defer wg.Done()
 		logger.Info().Msg(fmt.Sprintf("starting telegram bot..."))
-		app.TelegramBot.Start()
+		app.TelegramBot.Start(ctx)
 	}()
 }
 
