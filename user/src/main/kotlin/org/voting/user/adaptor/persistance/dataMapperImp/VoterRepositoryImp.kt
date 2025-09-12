@@ -1,7 +1,7 @@
 package org.voting.user.adaptor.persistance.dataMapperImp
 
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
-import org.voting.user.adaptor.persistance.entity.Voter
 import org.voting.user.adaptor.persistance.mapper.VoterMapper
 import org.voting.user.adaptor.persistance.repository.MongoVoterRepository
 import org.voting.user.domain.ports.outbound.persistance.VoterRepositoryInterface
@@ -15,6 +15,11 @@ class VoterRepositoryImp(
 
     override fun findByTelegramId(telegramId: String): VoterModel? {
         val voter = mongoVoterRepository.findByTelegramId(telegramId)
+        return voter?.let { voterMapper.entityToModel(it) }
+    }
+
+    override fun findByUserId(userId: String): VoterModel? {
+        val voter = mongoVoterRepository.findByIdOrNull(userId)
         return voter?.let { voterMapper.entityToModel(it) }
     }
 
