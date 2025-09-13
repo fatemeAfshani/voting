@@ -11,15 +11,28 @@ service PollService {
       body: "*"
     };
   };
-  rpc updatePoll(UpdatePollRequest) returns (EmptyResponse);
-  rpc addQuestion(AddQuestionRequest) returns (EmptyResponse);
+  rpc updatePoll(UpdatePollRequest) returns (Empty);
+  rpc addQuestion(AddQuestionRequest) returns (Empty);
+  rpc getActivePolls(Empty) returns (GetActivePollsResponse);
+
   rpc startPoll(StartPollRequest) returns (PollResponse);
   rpc closePoll(RequestWithPollId) returns (PollResponse);
   rpc getPollStatus(RequestWithPollId) returns (PollStatusResponse);
   rpc payForPoll(PayForPollRequest) returns (PollResponse);
 }
 
-message EmptyResponse {}
+message Empty {}
+
+message PollInfo {
+  string title = 1;
+  string description = 2;
+  map<string, string> preferences = 3;
+  int32 remainingVoters = 4;
+}
+
+message GetActivePollsResponse {
+  repeated PollInfo polls = 1;
+}
 
 message CreatePollRequest {
   optional string title = 1;

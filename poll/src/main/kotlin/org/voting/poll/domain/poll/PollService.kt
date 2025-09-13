@@ -5,10 +5,13 @@ import org.voting.poll.adaptor.exception.Errors
 import org.voting.poll.adaptor.exception.ForbiddenException
 import org.voting.poll.adaptor.exception.NotFoundException
 import org.voting.poll.adaptor.exception.UnknownException
+import org.voting.poll.domain.poll.dto.ActivePollsDTO
 import org.voting.poll.domain.poll.dto.AddQuestionDTO
 import org.voting.poll.domain.poll.dto.CreatePollDTO
 import org.voting.poll.domain.poll.dto.UpdatePollDTO
+import org.voting.poll.domain.poll.enums.PollStatus
 import org.voting.poll.domain.poll.enums.QuestionType
+import org.voting.poll.domain.poll.enums.Roles
 import org.voting.poll.domain.ports.inbound.PollUseCase
 import org.voting.poll.domain.ports.outbound.persistance.PollRepository
 
@@ -52,5 +55,13 @@ class PollService(private val pollRepository: PollRepository) : PollUseCase {
         poll.questions = existingQuestions
 
         pollRepository.save(poll)
+    }
+
+    override fun getActivePolls(userId: String?, role: Roles?): List<ActivePollsDTO> {
+        if (userId == null || role != Roles.VOTER) {
+            throw ForbiddenException()
+        }
+        return pollRepository.findByStatus(PollStatus.ACTIVE)
+            .map { ActivePollsDTO(it?.title, it?.description, it?.preferences) }
     }
 }

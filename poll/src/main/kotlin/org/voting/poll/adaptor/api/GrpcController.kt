@@ -6,10 +6,12 @@ import org.voting.poll.adaptor.api.mapper.AddQuestionMapper
 import org.voting.poll.adaptor.api.mapper.CreatePollMapper
 import org.voting.poll.adaptor.api.mapper.PollResponseMapper
 import org.voting.poll.adaptor.api.mapper.UpdatePollMapper
+import org.voting.poll.domain.poll.enums.Roles
 import org.voting.poll.domain.ports.inbound.PollUseCase
 import poll.Poll.AddQuestionRequest
 import poll.Poll.CreatePollRequest
-import poll.Poll.EmptyResponse
+import poll.Poll.Empty
+import poll.Poll.GetActivePollsResponse
 import poll.Poll.PollResponse
 import poll.Poll.UpdatePollRequest
 import poll.PollServiceGrpcKt
@@ -25,17 +27,46 @@ class GrpcController(
         return PollResponseMapper.mapper.dtoToProto(createdPoll)
     }
 
-    override suspend fun updatePoll(request: UpdatePollRequest): EmptyResponse {
+    override suspend fun updatePoll(request: UpdatePollRequest): Empty {
         val userId = UserInterceptor.USER_ID_KEY.get()
         val role = UserInterceptor.ROLE_KEY.get()
         pollService.updatePoll(UpdatePollMapper.mapper.protoToDto(request, role, userId))
-        return EmptyResponse.getDefaultInstance()
+        return Empty.getDefaultInstance()
     }
 
-    override suspend fun addQuestion(request: AddQuestionRequest): EmptyResponse {
+    override suspend fun addQuestion(request: AddQuestionRequest): Empty {
         val userId = UserInterceptor.USER_ID_KEY.get()
         val role = UserInterceptor.ROLE_KEY.get()
         pollService.addQuestion(AddQuestionMapper.mapper.protoToDto(request, role, userId))
-        return EmptyResponse.getDefaultInstance()
+        return Empty.getDefaultInstance()
+    }
+
+    override suspend fun getActivePolls(request: Empty): GetActivePollsResponse {
+        val userId = UserInterceptor.USER_ID_KEY.get()
+        val role = UserInterceptor.ROLE_KEY.get()
+
+        val convertedRole = try {
+            Roles.valueOf(role)
+        } catch (e: IllegalArgumentException) {
+            null
+        }
+
+        val activePolls = pollService.getActivePolls(userId, convertedRole)
+
+        return GetActivePollsResponse.newBuilder()
+            .addAllPolls(
+                activePolls.map { poll ->
+                    PollInfo.newBuilder()
+                        .setTitle(poll.title)
+                        .setDescription(poll.description)
+                        .addAllPreferences(
+                            poll.preferences?.map { pref ->
+                                PollPreference.newBuilder().setValue(pref).build()
+                            }
+                        )
+                        .build()
+                }
+            )
+            .build()
     }
 }
