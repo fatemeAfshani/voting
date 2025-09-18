@@ -42,19 +42,20 @@ class VoterGrpcControllerTest {
     @Test
     fun `loginWithTelegram returns id and token`(): Unit = runBlocking {
         val telegramId = "tg-123"
-        val voter = VoterModel(id = "voter-1", telegramId = telegramId)
+        val userId = "random"
+        val voter = VoterModel(id = "voter-1", telegramId = telegramId, userId = userId)
         whenever(voterUseCase.loginWithTelegram(telegramId)).thenReturn(voter)
-        whenever(jwtUtil.generateToken("voter-1", "VOTER")).thenReturn("jwt-token")
+        whenever(jwtUtil.generateToken(userId, "VOTER")).thenReturn("jwt-token")
 
         val request = User.TelegramLoginRequest.newBuilder().setTelegramId(telegramId).build()
 
         val resp = controller.loginWithTelegram(request)
 
         assertNotNull(resp)
-        assertEquals("voter-1", resp.id)
+        assertEquals("random", resp.id)
         assertEquals("jwt-token", resp.token)
         verify(voterUseCase).loginWithTelegram(telegramId)
-        verify(jwtUtil).generateToken("voter-1", "VOTER")
+        verify(jwtUtil).generateToken(userId, "VOTER")
     }
 
     @Test
