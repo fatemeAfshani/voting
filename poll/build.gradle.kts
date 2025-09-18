@@ -44,6 +44,8 @@ dependencies {
     implementation("io.grpc:grpc-kotlin-stub:1.4.0")
     implementation("com.google.protobuf:protobuf-kotlin:3.24.4")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+    implementation("org.apache.poi:poi:5.2.4")
+    implementation("org.apache.poi:poi-ooxml:5.2.4")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.testcontainers:testcontainers:$testContainerVersion")

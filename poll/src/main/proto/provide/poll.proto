@@ -14,6 +14,7 @@ service PollService {
   rpc payForPoll(PayForPollRequest) returns (PollResponse);
   rpc startVoting(StartVotingRequest) returns (StartVotingResponse);
   rpc answerQuestion(AnswerQuestionRequest) returns (AnswerQuestionResponse);
+  rpc getReport(PollReportRequest) returns (PollReportResponse);
 }
 
 message Empty {}
@@ -103,6 +104,15 @@ message AnswerQuestionResponse {
   optional string nextAnswer = 2;
   Question previousQuestion = 3;
   optional string previousAnswer = 4;
+}
+
+message PollReportRequest {
+  string pollId = 1;
+}
+
+message PollReportResponse {
+  bytes excelFile = 1;
+  string fileName = 2;
 }
 
 message PollStatusResponse {

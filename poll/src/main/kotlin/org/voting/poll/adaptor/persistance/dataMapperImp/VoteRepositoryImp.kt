@@ -19,6 +19,11 @@ class VoteRepositoryImp(
         val saved = VoteMapper.mapper.modelToEntity(vote).let { mongoVoteRepository.save(it) }
         return VoteMapper.mapper.entityToModel(saved)
     }
+
+    override fun findByPollId(pollId: String): List<VoteModel> {
+        val entities = mongoVoteRepository.findByPollId(pollId)
+        return entities.map { VoteMapper.mapper.entityToModel(it) }
+    }
 }
 
 
