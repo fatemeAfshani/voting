@@ -6,4 +6,5 @@ import org.voting.user.domain.voter.dto.UpdateProfileDto
 interface VoterUseCase {
     fun loginWithTelegram(telegramId: String): VoterModel
     fun updateProfile(data: UpdateProfileDto): VoterModel
+    fun findByUserId(userId: String): VoterModel?
 }

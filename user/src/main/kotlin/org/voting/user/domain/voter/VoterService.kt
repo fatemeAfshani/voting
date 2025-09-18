@@ -8,6 +8,7 @@ import org.voting.user.domain.ports.inbound.VoterUseCase
 import org.voting.user.domain.ports.outbound.persistance.VoterRepositoryInterface
 import org.voting.user.domain.user.Roles
 import org.voting.user.domain.voter.dto.UpdateProfileDto
+import java.util.*
 
 @Service
 class VoterService(
@@ -19,7 +20,7 @@ class VoterService(
         return if (existingVoter != null) {
             existingVoter
         } else {
-            val newVoter = VoterModel(telegramId = telegramId)
+            val newVoter = VoterModel(telegramId = telegramId, userId = UUID.randomUUID().toString())
             voterRepository.save(newVoter)
         }
     }
@@ -38,5 +39,9 @@ class VoterService(
         user.validate()
 
         return voterRepository.save(user)
+    }
+
+    override fun findByUserId(userId: String): VoterModel? {
+        return voterRepository.findByUserId(userId)
     }
 }

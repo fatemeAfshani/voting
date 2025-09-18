@@ -11,6 +11,7 @@ service CreatorService {
 service VoterService {
   rpc LoginWithTelegram(TelegramLoginRequest) returns (VoterLoginResponse);
   rpc UpdateProfile(UpdateVoterProfileRequest) returns (EmptyResponse);
+  rpc GetById(UserIdRequest) returns (UserInfo);
 }
 
 message EmptyResponse {}
@@ -33,6 +34,15 @@ message CreatorLoginResponse {
 message VoterLoginResponse {
   string id = 1;
   string token = 2;
+}
+
+message UserIdRequest {
+  string userId = 1;
+}
+
+message UserInfo {
+  string id = 1;
+  map<string, string> preferences = 2;
 }
 
 enum Genders {
