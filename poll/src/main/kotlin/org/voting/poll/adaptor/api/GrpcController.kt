@@ -6,7 +6,6 @@ import org.voting.poll.adaptor.api.mapper.*
 import org.voting.poll.domain.poll.enums.Roles
 import org.voting.poll.domain.ports.inbound.PollUseCase
 import org.voting.poll.domain.ports.inbound.VoteUseCase
-import poll.Poll
 import poll.Poll.AddQuestionRequest
 import poll.Poll.AnswerQuestionRequest
 import poll.Poll.AnswerQuestionResponse
