@@ -7,6 +7,7 @@ import org.springframework.data.annotation.Version
 import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document
 import java.util.Date
+import java.util.UUID
 
 @Document("creators")
 data class Creator(
@@ -25,4 +26,6 @@ data class Creator(
     var company: String? = null,
     @Indexed
     var telegramId: String? = null,
+    @Indexed
+    val userId: String? = UUID.randomUUID().toString(),
 )

@@ -13,13 +13,15 @@ object Errors {
         FIELD_OF_STUDY_IS_INVALID,
         MARITAL_STATUS_IS_INVALID,
         CITY_IS_INVALID,
-        INVALID_ROLE
+        INVALID_ROLE,
+        INTERNAL_ERROR
     }
 
     val ErrorMessages = mapOf(
         ErrorCodes.FORBIDDEN.name to "شما دسترسی لازم را ندارید",
         ErrorCodes.UNAUTHORIZED.name to "شما دسترسی لازم را ندارید",
         ErrorCodes.UNKNOWN_ERROR.name to "خطای ناشناخته",
+        ErrorCodes.INTERNAL_ERROR.name to "خطای داخلی پیش آمده است",
         ErrorCodes.USER_NOT_FOUND.name to "کاربر یافت نشد",
         ErrorCodes.JOB_IS_INVALID.name to "شغل وارد شده معتبر نیست",
         ErrorCodes.AGE_IS_INVALID.name to "سن باید بین ۰ تا ۱۰۰ باشد",

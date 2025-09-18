@@ -83,7 +83,7 @@ protobuf {
 sourceSets {
     main {
         proto {
-            srcDir("src/main/proto")
+            srcDir("src/main/proto/provide")
         }
     }
 }

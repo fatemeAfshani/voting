@@ -1,16 +1,9 @@
 syntax = "proto3";
 
-import "annotations.proto";
-
 package poll;
 
 service PollService {
-  rpc createPoll(CreatePollRequest) returns (PollResponse){
-    option (google.api.http) = {
-      post: "/api/v1/poll"
-      body: "*"
-    };
-  };
+  rpc createPoll(CreatePollRequest) returns (PollResponse);
   rpc updatePoll(UpdatePollRequest) returns (Empty);
   rpc addQuestion(AddQuestionRequest) returns (Empty);
   rpc getActivePolls(Empty) returns (GetActivePollsResponse);

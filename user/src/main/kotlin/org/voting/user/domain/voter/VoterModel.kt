@@ -10,6 +10,7 @@ import java.util.*
 data class VoterModel(
     val id: String? = null,
     val telegramId: String,
+    val userId: String? = null,
     var city: String? = null,
     var gender: Genders? = null,
     var age: Int? = null,

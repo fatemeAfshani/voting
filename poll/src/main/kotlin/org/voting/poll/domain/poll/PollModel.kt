@@ -10,7 +10,7 @@ data class PollModel(
     var creatorId: String,
     var title: String? = null,
     var description: String? = null,
-    var status: PollStatus = PollStatus.DRAFT,
+    var status: PollStatus = PollStatus.ACTIVE,
     var price: Int = 0,
     var maxVoters: Int = 0,
     var version: Long = 0,

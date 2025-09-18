@@ -4,6 +4,7 @@ import java.util.Date
 
 data class CreatorModel(
     var id: String? = null,
+    var userId: String? = null,
     var createDate: Date? = null,
     var updatedAt: Date? = null,
     var version: Long? = null,

@@ -60,7 +60,7 @@ class VoterIntegrationTest {
 
         val voter = voterUseCase.loginWithTelegram(request.telegramId)
 
-        assertNotNull(voter.id)
+        assertNotNull(voter.userId)
         val saved = mongoVoterRepository.findByTelegramId(telegramId)
         assertNotNull(saved)
         assertEquals(telegramId, saved.telegramId)
@@ -69,14 +69,14 @@ class VoterIntegrationTest {
     @Test
     fun `loginWithTelegram fetches existing voter`(): Unit = runBlocking {
         val telegramId = "tg-int-2"
-        mongoVoterRepository.save(org.voting.user.adaptor.persistance.entity.Voter(telegramId = telegramId))
+        mongoVoterRepository.save(org.voting.user.adaptor.persistance.entity.Voter(telegramId = telegramId, userId = "random"))
 
         val voter = voterUseCase.loginWithTelegram(telegramId)
 
-        assertNotNull(voter.id)
+        assertNotNull(voter.userId)
         val saved = mongoVoterRepository.findByTelegramId(telegramId)
         assertNotNull(saved)
-        assertEquals(saved.id, voter.id)
+        assertEquals(saved.userId, voter.userId)
     }
 
 
@@ -84,7 +84,7 @@ class VoterIntegrationTest {
     fun `updateProfile with all fields updates successfully`(): Unit = runBlocking {
         val telegramId = "tg-profile-1"
         val voter = voterUseCase.loginWithTelegram(telegramId)
-        assertNotNull(voter.id)
+        assertNotNull(voter.userId)
 
         val updateDto = UpdateProfileDto(
             city = "New York",
@@ -94,7 +94,7 @@ class VoterIntegrationTest {
             educationLevel = EducationLevels.BACHELOR,
             fieldOfStudy = "Computer Science",
             maritalStatus = MaritalStatuses.SINGLE,
-            userId = voter.id,
+            userId = voter.userId,
             userRole = Roles.VOTER
         )
 
@@ -113,12 +113,12 @@ class VoterIntegrationTest {
     fun `updateProfile with partial fields updates successfully`(): Unit = runBlocking {
         val telegramId = "tg-profile-2"
         val voter = voterUseCase.loginWithTelegram(telegramId)
-        assertNotNull(voter.id)
+        assertNotNull(voter.userId)
 
         val updateDto = UpdateProfileDto(
             city = "London",
             age = 30,
-            userId = voter.id,
+            userId = voter.userId,
             userRole = Roles.VOTER
         )
 
@@ -137,10 +137,10 @@ class VoterIntegrationTest {
     fun `updateProfile with empty fields updates successfully`(): Unit = runBlocking {
         val telegramId = "tg-profile-3"
         val voter = voterUseCase.loginWithTelegram(telegramId)
-        assertNotNull(voter.id)
+        assertNotNull(voter.userId)
 
         val updateDto = UpdateProfileDto(
-            userId = voter.id,
+            userId = voter.userId,
             userRole = Roles.VOTER
         )
 
@@ -154,11 +154,11 @@ class VoterIntegrationTest {
     fun `updateProfile throws ForbiddenException when user role is not VOTER`(): Unit = runBlocking {
         val telegramId = "tg-profile-4"
         val voter = voterUseCase.loginWithTelegram(telegramId)
-        assertNotNull(voter.id)
+        assertNotNull(voter.userId)
 
         val updateDto = UpdateProfileDto(
             city = "Paris",
-            userId = voter.id,
+            userId = voter.userId,
             userRole = Roles.CREATOR
         )
 
@@ -203,11 +203,11 @@ class VoterIntegrationTest {
     fun `updateProfile with invalid age throws IllegalArgumentException`(): Unit = runBlocking {
         val telegramId = "tg-profile-5"
         val voter = voterUseCase.loginWithTelegram(telegramId)
-        assertNotNull(voter.id)
+        assertNotNull(voter.userId)
 
         val updateDto = UpdateProfileDto(
             age = 150, // Invalid age
-            userId = voter.id,
+            userId = voter.userId,
             userRole = Roles.VOTER
         )
 
@@ -222,11 +222,11 @@ class VoterIntegrationTest {
     fun `updateProfile with invalid job length throws IllegalArgumentException`(): Unit = runBlocking {
         val telegramId = "tg-profile-6"
         val voter = voterUseCase.loginWithTelegram(telegramId)
-        assertNotNull(voter.id)
+        assertNotNull(voter.userId)
 
         val updateDto = UpdateProfileDto(
             job = "a".repeat(101), // Exceeds 100 characters
-            userId = voter.id,
+            userId = voter.userId,
             userRole = Roles.VOTER
         )
 
@@ -241,11 +241,11 @@ class VoterIntegrationTest {
     fun `updateProfile with invalid field of study length throws IllegalArgumentException`(): Unit = runBlocking {
         val telegramId = "tg-profile-7"
         val voter = voterUseCase.loginWithTelegram(telegramId)
-        assertNotNull(voter.id)
+        assertNotNull(voter.userId)
 
         val updateDto = UpdateProfileDto(
             fieldOfStudy = "a".repeat(101), // Exceeds 100 characters
-            userId = voter.id,
+            userId = voter.userId,
             userRole = Roles.VOTER
         )
 
@@ -260,11 +260,11 @@ class VoterIntegrationTest {
     fun `updateProfile with invalid city length throws IllegalArgumentException`(): Unit = runBlocking {
         val telegramId = "tg-profile-8"
         val voter = voterUseCase.loginWithTelegram(telegramId)
-        assertNotNull(voter.id)
+        assertNotNull(voter.userId)
 
         val updateDto = UpdateProfileDto(
             city = "a".repeat(101), // Exceeds 100 characters
-            userId = voter.id,
+            userId = voter.userId,
             userRole = Roles.VOTER
         )
 
@@ -279,7 +279,7 @@ class VoterIntegrationTest {
     fun `updateProfile with all education levels works correctly`(): Unit = runBlocking {
         val telegramId = "tg-profile-9"
         val voter = voterUseCase.loginWithTelegram(telegramId)
-        assertNotNull(voter.id)
+        assertNotNull(voter.userId)
 
         val educationLevels = listOf(
             EducationLevels.STUDENT,
@@ -292,7 +292,7 @@ class VoterIntegrationTest {
         educationLevels.forEach { educationLevel ->
             val updateDto = UpdateProfileDto(
                 educationLevel = educationLevel,
-                userId = voter.id,
+                userId = voter.userId,
                 userRole = Roles.VOTER
             )
 
@@ -305,7 +305,7 @@ class VoterIntegrationTest {
     fun `updateProfile with all marital statuses works correctly`(): Unit = runBlocking {
         val telegramId = "tg-profile-10"
         val voter = voterUseCase.loginWithTelegram(telegramId)
-        assertNotNull(voter.id)
+        assertNotNull(voter.userId)
 
         val maritalStatuses = listOf(
             MaritalStatuses.MARRIED,
@@ -315,7 +315,7 @@ class VoterIntegrationTest {
         maritalStatuses.forEach { maritalStatus ->
             val updateDto = UpdateProfileDto(
                 maritalStatus = maritalStatus,
-                userId = voter.id,
+                userId = voter.userId,
                 userRole = Roles.VOTER
             )
 
@@ -328,7 +328,7 @@ class VoterIntegrationTest {
     fun `updateProfile with all genders works correctly`(): Unit = runBlocking {
         val telegramId = "tg-profile-11"
         val voter = voterUseCase.loginWithTelegram(telegramId)
-        assertNotNull(voter.id)
+        assertNotNull(voter.userId)
 
         val genders = listOf(
             Genders.MALE,
@@ -338,7 +338,7 @@ class VoterIntegrationTest {
         genders.forEach { gender ->
             val updateDto = UpdateProfileDto(
                 gender = gender,
-                userId = voter.id,
+                userId = voter.userId,
                 userRole = Roles.VOTER
             )
 

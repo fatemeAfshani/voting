@@ -67,7 +67,7 @@ class PollIntegrationTest {
         assertNotNull(createdPoll.id)
         val data = mongoPollRepository.findOneById(createdPoll.id!!)
         assertEquals(data?.creatorId, Fixtures.mockCreatorId)
-        assertEquals(data?.status, PollStatus.DRAFT)
+        assertEquals(data?.status, PollStatus.ACTIVE)
     }
 
     @Test
@@ -91,7 +91,7 @@ class PollIntegrationTest {
         assertEquals(data?.title, "Test Poll Title")
         assertEquals(data?.description, "Test Poll Description")
         assertEquals(data?.maxVoters, 100)
-        assertEquals(data?.status, PollStatus.DRAFT)
+        assertEquals(data?.status, PollStatus.ACTIVE)
     }
 
     @Test

@@ -20,7 +20,7 @@ data class Poll(
     val creatorId: String,
     val title: String? = null,
     val description: String? = null,
-    val status: PollStatus = PollStatus.DRAFT,
+    val status: PollStatus = PollStatus.ACTIVE,
     val price: Int = 0,
     val maxVoters: Int = 0,
     var startTime: Instant? = null,
