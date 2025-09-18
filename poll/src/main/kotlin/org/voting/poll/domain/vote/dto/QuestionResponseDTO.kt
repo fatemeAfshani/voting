@@ -6,5 +6,6 @@ class QuestionResponseDTO(
     var nextQuestion: PollQuestion,
     var nextQuestionAnswer: String?,
     var previousQuestion: PollQuestion,
-    var previousQuestionAnswer: String?
+    var previousQuestionAnswer: String?,
+    var pollId: String,
 )

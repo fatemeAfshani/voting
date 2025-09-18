@@ -13,6 +13,7 @@ service PollService {
   rpc getPollStatus(RequestWithPollId) returns (PollStatusResponse);
   rpc payForPoll(PayForPollRequest) returns (PollResponse);
   rpc startVoting(StartVotingRequest) returns (StartVotingResponse);
+  rpc answerQuestion(AnswerQuestionRequest) returns (AnswerQuestionResponse);
 }
 
 message Empty {}
@@ -89,6 +90,19 @@ message StartVotingRequest {
 message StartVotingResponse {
   Question firstQuestion = 1;
   optional string currentAnswer = 2;
+}
+
+message AnswerQuestionRequest {
+  string pollId = 1;
+  string questionId = 2;
+  string answer = 3;
+}
+
+message AnswerQuestionResponse {
+  Question nextQuestion = 1;
+  optional string nextAnswer = 2;
+  Question previousQuestion = 3;
+  optional string previousAnswer = 4;
 }
 
 message PollStatusResponse {

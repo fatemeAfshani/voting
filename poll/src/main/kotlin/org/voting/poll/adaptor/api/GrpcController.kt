@@ -2,17 +2,13 @@ package org.voting.poll.adaptor.api
 
 import net.devh.boot.grpc.server.service.GrpcService
 import org.voting.poll.adaptor.api.interceptors.UserInterceptor
-import org.voting.poll.adaptor.api.mapper.ActivePollsMapper
-import org.voting.poll.adaptor.api.mapper.AddQuestionMapper
-import org.voting.poll.adaptor.api.mapper.CreatePollMapper
-import org.voting.poll.adaptor.api.mapper.PollResponseMapper
-import org.voting.poll.adaptor.api.mapper.StartVotingMapper
-import org.voting.poll.adaptor.api.mapper.UpdatePollMapper
+import org.voting.poll.adaptor.api.mapper.*
 import org.voting.poll.domain.poll.enums.Roles
 import org.voting.poll.domain.ports.inbound.PollUseCase
 import org.voting.poll.domain.ports.inbound.VoteUseCase
-import poll.Poll
 import poll.Poll.AddQuestionRequest
+import poll.Poll.AnswerQuestionRequest
+import poll.Poll.AnswerQuestionResponse
 import poll.Poll.CreatePollRequest
 import poll.Poll.Empty
 import poll.Poll.GetActivePollsResponse
@@ -71,21 +67,13 @@ class GrpcController(
     override suspend fun startVoting(request: StartVotingRequest): StartVotingResponse {
         val userId = UserInterceptor.USER_ID_KEY.get()
         val role = UserInterceptor.ROLE_KEY.get()
-        val mapper = StartVotingMapper.mapper
 
         val voteResult = voteService.startVoting(
-            mapper.protoToDto(request, role, userId)
+            StartVotingMapper.mapper.protoToDto(request, role, userId)
         )
 
         val firstQuestion = voteResult.firstQuestion
-        val firstQuestionProto = Poll.Question.newBuilder()
-            .setQuestionId(firstQuestion.questionId)
-            .setPollId(voteResult.pollId)
-            .setQuestionType(mapper.mapQuestionType(firstQuestion.questionType))
-            .setQuestionText(firstQuestion.questionText)
-            .setShouldAnswer(firstQuestion.shouldAnswer)
-            .addAllOptions(mapper.mapOption(firstQuestion.options))
-            .build()
+        val firstQuestionProto = createQuestionProto(firstQuestion, voteResult.pollId)
 
         return StartVotingResponse.newBuilder()
             .apply {
@@ -93,6 +81,24 @@ class GrpcController(
                 setFirstQuestion(firstQuestionProto)
             }
             .build()
+    }
 
+    override suspend fun answerQuestion(request: AnswerQuestionRequest): AnswerQuestionResponse {
+        val userId = UserInterceptor.USER_ID_KEY.get()
+        val role = UserInterceptor.ROLE_KEY.get()
+
+        val result = voteService.answerQuestion(AnswerQuestionMapper.mapper.protoToDto(request, role, userId))
+
+        val nextQ = createQuestionProto(result.nextQuestion, result.pollId)
+        val prevQ = createQuestionProto(result.previousQuestion, result.pollId)
+
+        return AnswerQuestionResponse.newBuilder()
+            .setNextQuestion(nextQ)
+            .setPreviousQuestion(prevQ)
+            .apply {
+                result.nextQuestionAnswer?.let { setNextAnswer(it) }
+                result.previousQuestionAnswer?.let { setPreviousAnswer(it) }
+            }
+            .build()
     }
 }
