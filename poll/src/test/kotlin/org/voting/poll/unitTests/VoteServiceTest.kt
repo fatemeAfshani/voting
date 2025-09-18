@@ -50,13 +50,25 @@ class VoteServiceTest {
     fun `answerQuestion throws Forbidden when userId null or role not VOTER`() {
         assertThrows<ForbiddenException> {
             voteService.answerQuestion(
-                AnswerQuestionDTO(pollId = "p1", questionId = "q1", answer = "a1", userId = null, role = Roles.VOTER)
+                AnswerQuestionDTO(
+                    pollId = "p1",
+                    questionId = "q1",
+                    answer = "a1",
+                    userId = null,
+                    role = Roles.VOTER
+                )
             )
         }
 
         assertThrows<ForbiddenException> {
             voteService.answerQuestion(
-                AnswerQuestionDTO(pollId = "p1", questionId = "q1", answer = "a1", userId = "u1", role = Roles.CREATOR)
+                AnswerQuestionDTO(
+                    pollId = "p1",
+                    questionId = "q1",
+                    answer = "a1",
+                    userId = "u1",
+                    role = Roles.CREATOR
+                )
             )
         }
     }
@@ -105,7 +117,12 @@ class VoteServiceTest {
     fun `answerQuestion throws InvalidInput when non-EXPLAIN answer not in options`() {
         val opt1 = PollOption(optionId = "o1", optionText = "A")
         val opt2 = PollOption(optionId = "o2", optionText = "B")
-        val q1 = PollQuestion(questionId = "q1", questionText = "Choose", questionType = QuestionType.MULTIPLE_CHOICE, options = listOf(opt1, opt2))
+        val q1 = PollQuestion(
+            questionId = "q1",
+            questionText = "Choose",
+            questionType = QuestionType.MULTIPLE_CHOICE,
+            options = listOf(opt1, opt2)
+        )
         val poll = PollModel(id = "p1", creatorId = "c1", questions = listOf(q1))
         val vote = VoteModel(id = "v1", pollId = "p1", userId = "u1")
         whenever(pollRepository.findById("p1")).thenReturn(poll)
@@ -123,7 +140,12 @@ class VoteServiceTest {
         val q1 = PollQuestion(questionId = "q1", questionText = "Q1", questionType = QuestionType.EXPLAIN)
         val o21 = PollOption(optionId = "o21", optionText = "Yes")
         val o22 = PollOption(optionId = "o22", optionText = "No")
-        val q2 = PollQuestion(questionId = "q2", questionText = "Q2", questionType = QuestionType.MULTIPLE_CHOICE, options = listOf(o21, o22))
+        val q2 = PollQuestion(
+            questionId = "q2",
+            questionText = "Q2",
+            questionType = QuestionType.MULTIPLE_CHOICE,
+            options = listOf(o21, o22)
+        )
         val q3 = PollQuestion(questionId = "q3", questionText = "Q3", questionType = QuestionType.EXPLAIN)
         val poll = PollModel(id = "p1", creatorId = "c1", questions = listOf(q1, q2, q3))
 
