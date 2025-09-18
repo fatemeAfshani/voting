@@ -71,10 +71,6 @@ class VoteService(
         val nextAnswer = nextQuestion?.let { q -> vote.findAnswer(q.questionId)?.response }
         val prevAnswer = prevQuestion?.let { q -> vote.findAnswer(q.questionId)?.response }
 
-        if (nextQuestion == null) {
-            vote.isFinished = true
-        }
-
         voteRepository.save(vote)
 
         return QuestionResponseDTO(
