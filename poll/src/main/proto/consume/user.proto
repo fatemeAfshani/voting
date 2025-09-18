@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package user;
+
+service VoterService {
+  rpc GetById(UserIdRequest) returns (UserInfo);
+}
+
+message UserIdRequest {
+  string userId = 1;
+}
+
+message UserInfo {
+  string id = 1;
+  map<string, string> preferences = 2;
+}
+
+

@@ -1,5 +1,6 @@
 package org.voting.poll.domain.poll
 
+import kotlinx.coroutines.runBlocking
 import org.springframework.stereotype.Service
 import org.voting.poll.adaptor.exception.Errors
 import org.voting.poll.adaptor.exception.ForbiddenException
@@ -14,9 +15,14 @@ import org.voting.poll.domain.poll.enums.QuestionType
 import org.voting.poll.domain.poll.enums.Roles
 import org.voting.poll.domain.ports.inbound.PollUseCase
 import org.voting.poll.domain.ports.outbound.persistance.PollRepository
+import org.voting.poll.domain.ports.outbound.services.UserServiceInterface
+
 
 @Service
-class PollService(private val pollRepository: PollRepository) : PollUseCase {
+class PollService(
+    private val pollRepository: PollRepository,
+    private val userService: UserServiceInterface
+) : PollUseCase {
 
     override fun createPoll(createPollDto: CreatePollDTO): PollModel {
         val (title, description, userId) = createPollDto
@@ -61,7 +67,18 @@ class PollService(private val pollRepository: PollRepository) : PollUseCase {
         if (userId == null || role != Roles.VOTER) {
             throw ForbiddenException()
         }
-        return pollRepository.findByStatus(PollStatus.ACTIVE)
-            .map { ActivePollsDTO(it?.title, it?.description, it?.preferences) }
+        val activePolls = pollRepository.findByStatus(PollStatus.ACTIVE)
+
+        val voterPreferences = userService.getUserPreferences(userId)
+
+        return activePolls.filter { poll ->
+            val prefs = poll?.preferences
+            if (prefs.isNullOrEmpty()) {
+                true
+            } else {
+                // if at least one preference key/value matches, include
+                prefs.any { (k, v) -> voterPreferences[k] == v }
+            }
+        }.map { ActivePollsDTO(it?.title, it?.description, it?.preferences) }
     }
 }

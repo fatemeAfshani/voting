@@ -2,6 +2,7 @@ package org.voting.poll.adaptor.api
 
 import net.devh.boot.grpc.server.service.GrpcService
 import org.voting.poll.adaptor.api.interceptors.UserInterceptor
+import org.voting.poll.adaptor.api.mapper.ActivePollsMapper
 import org.voting.poll.adaptor.api.mapper.AddQuestionMapper
 import org.voting.poll.adaptor.api.mapper.CreatePollMapper
 import org.voting.poll.adaptor.api.mapper.PollResponseMapper
@@ -12,6 +13,7 @@ import poll.Poll.AddQuestionRequest
 import poll.Poll.CreatePollRequest
 import poll.Poll.Empty
 import poll.Poll.GetActivePollsResponse
+import poll.Poll.PollInfo
 import poll.Poll.PollResponse
 import poll.Poll.UpdatePollRequest
 import poll.PollServiceGrpcKt
@@ -53,20 +55,10 @@ class GrpcController(
 
         val activePolls = pollService.getActivePolls(userId, convertedRole)
 
+        val protoPolls: List<PollInfo> = ActivePollsMapper.MAPPER.toProtoList(activePolls)
+
         return GetActivePollsResponse.newBuilder()
-            .addAllPolls(
-                activePolls.map { poll ->
-                    PollInfo.newBuilder()
-                        .setTitle(poll.title)
-                        .setDescription(poll.description)
-                        .addAllPreferences(
-                            poll.preferences?.map { pref ->
-                                PollPreference.newBuilder().setValue(pref).build()
-                            }
-                        )
-                        .build()
-                }
-            )
+            .addAllPolls(protoPolls)
             .build()
     }
 }
