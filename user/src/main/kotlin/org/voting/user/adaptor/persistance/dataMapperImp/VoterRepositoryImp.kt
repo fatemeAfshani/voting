@@ -19,7 +19,7 @@ class VoterRepositoryImp(
     }
 
     override fun findByUserId(userId: String): VoterModel? {
-        val voter = mongoVoterRepository.findByIdOrNull(userId)
+        val voter = mongoVoterRepository.findByUserId(userId)
         return voter?.let { voterMapper.entityToModel(it) }
     }
 

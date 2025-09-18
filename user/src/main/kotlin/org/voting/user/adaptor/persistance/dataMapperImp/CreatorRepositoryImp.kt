@@ -11,7 +11,7 @@ class CreatorRepositoryImp(
     private val mongoCreatorRepository: MongoCreatorRepository
 ) : CreatorRepositoryInterface {
     override fun findOneById(id: String): CreatorModel? {
-        val entity = mongoCreatorRepository.findOneById(id)
+        val entity = mongoCreatorRepository.findByUserId(id)
         return CreatorMapper.mapper.entityToModel(entity)
     }
 

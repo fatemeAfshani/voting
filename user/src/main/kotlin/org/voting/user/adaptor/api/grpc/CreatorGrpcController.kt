@@ -2,6 +2,8 @@ package org.voting.user.adaptor.api.grpc
 
 import net.devh.boot.grpc.server.service.GrpcService
 import org.voting.user.adaptor.api.JwtUtil
+import org.voting.user.adaptor.exception.Errors
+import org.voting.user.adaptor.exception.InternalException
 import org.voting.user.domain.creator.dto.RegisterDto
 import org.voting.user.domain.ports.inbound.CreatorUseCase
 import org.voting.user.domain.user.Roles
@@ -24,9 +26,11 @@ class CreatorGrpcController(
                 telegramId = request.telegramId
             )
         )
-        val token = jwtUtil.generateToken(created.id!!, Roles.CREATOR.name)
+        val userId = created.userId ?: throw InternalException(Errors.ErrorCodes.INTERNAL_ERROR.name)
+
+        val token = jwtUtil.generateToken(userId, Roles.CREATOR.name)
         return CreatorLoginResponse.newBuilder()
-            .setId(created.id)
+            .setId(userId)
             .setToken(token)
             .build()
     }
@@ -39,18 +43,22 @@ class CreatorGrpcController(
                 telegramId = request.telegramId
             )
         )
-        val token = jwtUtil.generateToken(creator.id!!, Roles.CREATOR.name)
+        val userId = creator.userId ?: throw InternalException(Errors.ErrorCodes.INTERNAL_ERROR.name)
+
+        val token = jwtUtil.generateToken(userId, Roles.CREATOR.name)
         return CreatorLoginResponse.newBuilder()
-            .setId(creator.id)
+            .setId(userId)
             .setToken(token)
             .build()
     }
 
     override suspend fun loginWithTelegram(request: TelegramLoginRequest): CreatorLoginResponse {
         val creator = service.loginWithTelegram(request.telegramId)
-        val token = jwtUtil.generateToken(creator.id!!, Roles.CREATOR.name)
+        val userId = creator.userId ?: throw InternalException(Errors.ErrorCodes.INTERNAL_ERROR.name)
+
+        val token = jwtUtil.generateToken(userId, Roles.CREATOR.name)
         return CreatorLoginResponse.newBuilder()
-            .setId(creator.id)
+            .setId(userId)
             .setToken(token)
             .build()
     }

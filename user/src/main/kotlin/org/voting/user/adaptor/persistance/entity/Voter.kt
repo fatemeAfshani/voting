@@ -17,6 +17,8 @@ data class Voter(
     val id: String? = null,
     @Indexed
     val telegramId: String,
+    @Indexed
+    val userId: String? = null,
     val city: String? = null,
     val gender: Genders? = null,
     val age: Int? = null,

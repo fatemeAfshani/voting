@@ -7,4 +7,6 @@ import org.voting.user.adaptor.persistance.entity.Voter
 @Repository
 interface MongoVoterRepository : MongoRepository<Voter, String> {
     fun findByTelegramId(telegramId: String): Voter?
+
+    fun findByUserId(userId: String): Voter?
 }
