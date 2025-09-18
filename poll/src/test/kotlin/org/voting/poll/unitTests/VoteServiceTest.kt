@@ -8,6 +8,7 @@ import org.mockito.Mock
 import org.mockito.Mockito.verify
 import org.mockito.junit.jupiter.MockitoExtension
 import org.voting.poll.adaptor.exception.ForbiddenException
+import org.voting.poll.adaptor.exception.InvalidInputException
 import org.voting.poll.adaptor.exception.NotFoundException
 import org.voting.poll.domain.poll.PollModel
 import org.voting.poll.domain.poll.PollOption
@@ -20,6 +21,7 @@ import org.voting.poll.domain.ports.outbound.services.UserServiceInterface
 import org.voting.poll.domain.vote.AnswerModel
 import org.voting.poll.domain.vote.VoteModel
 import org.voting.poll.domain.vote.VoteService
+import org.voting.poll.domain.vote.dto.AnswerQuestionDTO
 import org.voting.poll.domain.vote.dto.StartVoteDTO
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -42,6 +44,114 @@ class VoteServiceTest {
     @BeforeEach
     fun setup() {
         voteService = VoteService(userService, voteRepository, pollRepository)
+    }
+
+    @Test
+    fun `answerQuestion throws Forbidden when userId null or role not VOTER`() {
+        assertThrows<ForbiddenException> {
+            voteService.answerQuestion(
+                AnswerQuestionDTO(pollId = "p1", questionId = "q1", answer = "a1", userId = null, role = Roles.VOTER)
+            )
+        }
+
+        assertThrows<ForbiddenException> {
+            voteService.answerQuestion(
+                AnswerQuestionDTO(pollId = "p1", questionId = "q1", answer = "a1", userId = "u1", role = Roles.CREATOR)
+            )
+        }
+    }
+
+    @Test
+    fun `answerQuestion throws NotFound when poll not found`() {
+        whenever(pollRepository.findById("p-na")).thenReturn(null)
+
+        assertThrows<NotFoundException> {
+            voteService.answerQuestion(
+                AnswerQuestionDTO(pollId = "p-na", questionId = "q1", answer = "a1", userId = "u1", role = Roles.VOTER)
+            )
+        }
+    }
+
+    @Test
+    fun `answerQuestion throws NotFound when vote not found`() {
+        val q1 = PollQuestion(questionId = "q1", questionText = "Q1", questionType = QuestionType.EXPLAIN)
+        val poll = PollModel(id = "p1", creatorId = "c1", questions = listOf(q1))
+        whenever(pollRepository.findById("p1")).thenReturn(poll)
+        whenever(voteRepository.findByPollIdAndUserId("p1", "u1")).thenReturn(null)
+
+        assertThrows<NotFoundException> {
+            voteService.answerQuestion(
+                AnswerQuestionDTO(pollId = "p1", questionId = "q1", answer = "hi", userId = "u1", role = Roles.VOTER)
+            )
+        }
+    }
+
+    @Test
+    fun `answerQuestion throws NotFound when question not found`() {
+        val q1 = PollQuestion(questionId = "q1", questionText = "Q1", questionType = QuestionType.EXPLAIN)
+        val poll = PollModel(id = "p1", creatorId = "c1", questions = listOf(q1))
+        val vote = VoteModel(id = "v1", pollId = "p1", userId = "u1")
+        whenever(pollRepository.findById("p1")).thenReturn(poll)
+        whenever(voteRepository.findByPollIdAndUserId("p1", "u1")).thenReturn(vote)
+
+        assertThrows<NotFoundException> {
+            voteService.answerQuestion(
+                AnswerQuestionDTO(pollId = "p1", questionId = "q-na", answer = "a1", userId = "u1", role = Roles.VOTER)
+            )
+        }
+    }
+
+    @Test
+    fun `answerQuestion throws InvalidInput when non-EXPLAIN answer not in options`() {
+        val opt1 = PollOption(optionId = "o1", optionText = "A")
+        val opt2 = PollOption(optionId = "o2", optionText = "B")
+        val q1 = PollQuestion(questionId = "q1", questionText = "Choose", questionType = QuestionType.MULTIPLE_CHOICE, options = listOf(opt1, opt2))
+        val poll = PollModel(id = "p1", creatorId = "c1", questions = listOf(q1))
+        val vote = VoteModel(id = "v1", pollId = "p1", userId = "u1")
+        whenever(pollRepository.findById("p1")).thenReturn(poll)
+        whenever(voteRepository.findByPollIdAndUserId("p1", "u1")).thenReturn(vote)
+
+        assertThrows<InvalidInputException> {
+            voteService.answerQuestion(
+                AnswerQuestionDTO(pollId = "p1", questionId = "q1", answer = "o3", userId = "u1", role = Roles.VOTER)
+            )
+        }
+    }
+
+    @Test
+    fun `answerQuestion upserts answer and returns prev and next question with answers`() {
+        val q1 = PollQuestion(questionId = "q1", questionText = "Q1", questionType = QuestionType.EXPLAIN)
+        val o21 = PollOption(optionId = "o21", optionText = "Yes")
+        val o22 = PollOption(optionId = "o22", optionText = "No")
+        val q2 = PollQuestion(questionId = "q2", questionText = "Q2", questionType = QuestionType.MULTIPLE_CHOICE, options = listOf(o21, o22))
+        val q3 = PollQuestion(questionId = "q3", questionText = "Q3", questionType = QuestionType.EXPLAIN)
+        val poll = PollModel(id = "p1", creatorId = "c1", questions = listOf(q1, q2, q3))
+
+        val existingVote = VoteModel(
+            id = "v1",
+            pollId = "p1",
+            userId = "u1",
+            answers = mutableListOf(
+                AnswerModel(questionId = "q1", response = "A1"),
+                AnswerModel(questionId = "q3", response = "A3")
+            )
+        )
+
+        whenever(pollRepository.findById("p1")).thenReturn(poll)
+        whenever(voteRepository.findByPollIdAndUserId("p1", "u1")).thenReturn(existingVote)
+
+        val resp = voteService.answerQuestion(
+            AnswerQuestionDTO(pollId = "p1", questionId = "q2", answer = "o22", userId = "u1", role = Roles.VOTER)
+        )
+
+        assertEquals("q3", resp.nextQuestion.questionId)
+        assertEquals("A3", resp.nextQuestionAnswer)
+        assertEquals("q1", resp.previousQuestion.questionId)
+        assertEquals("A1", resp.previousQuestionAnswer)
+
+        // ensure upsert happened
+        assertEquals("o22", existingVote.answers.first { it.questionId == "q2" }.response)
+        verify(voteRepository).save(existingVote)
     }
 
     @Test
@@ -92,15 +202,15 @@ class VoteServiceTest {
         whenever(pollRepository.findById("p1")).thenReturn(poll)
         whenever(userService.getUserPreferences("u1")).thenReturn(emptyMap())
         whenever(voteRepository.findByPollIdAndUserId("p1", "u1")).thenReturn(null)
-        whenever(voteRepository.save(VoteModel(pollId = "p1", userId = "u1", answers = emptyList())))
-            .thenReturn(VoteModel(id = "v1", pollId = "p1", userId = "u1", answers = emptyList()))
+        whenever(voteRepository.save(VoteModel(pollId = "p1", userId = "u1")))
+            .thenReturn(VoteModel(id = "v1", pollId = "p1", userId = "u1"))
 
         val resp = voteService.startVoting(StartVoteDTO(pollId = "p1", userId = "u1", role = Roles.VOTER))
 
         assertEquals("p1", resp.pollId)
         assertEquals(q1.questionId, resp.firstQuestion.questionId)
         assertNull(resp.currentAnswer)
-        verify(voteRepository).save(VoteModel(pollId = "p1", userId = "u1", answers = emptyList()))
+        verify(voteRepository).save(VoteModel(pollId = "p1", userId = "u1"))
     }
 
     @Test
@@ -113,7 +223,7 @@ class VoteServiceTest {
             id = "v-existing",
             pollId = "p2",
             userId = "u2",
-            answers = listOf(AnswerModel(questionId = q1.questionId, response = "My answer"))
+            answers = mutableListOf(AnswerModel(questionId = q1.questionId, response = "My answer"))
         )
         whenever(voteRepository.findByPollIdAndUserId("p2", "u2")).thenReturn(existingVote)
 
