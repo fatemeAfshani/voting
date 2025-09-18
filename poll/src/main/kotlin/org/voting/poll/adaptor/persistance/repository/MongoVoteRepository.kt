@@ -5,6 +5,7 @@ import org.voting.poll.adaptor.persistance.entity.Vote
 
 interface MongoVoteRepository : MongoRepository<Vote, String> {
     fun findOneByPollIdAndUserId(pollId: String, userId: String): Vote?
+    fun findByPollId(pollId: String): List<Vote>
 }
 
 

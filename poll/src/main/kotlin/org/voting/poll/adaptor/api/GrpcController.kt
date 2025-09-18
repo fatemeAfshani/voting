@@ -6,6 +6,7 @@ import org.voting.poll.adaptor.api.mapper.*
 import org.voting.poll.domain.poll.enums.Roles
 import org.voting.poll.domain.ports.inbound.PollUseCase
 import org.voting.poll.domain.ports.inbound.VoteUseCase
+import poll.Poll
 import poll.Poll.AddQuestionRequest
 import poll.Poll.AnswerQuestionRequest
 import poll.Poll.AnswerQuestionResponse
@@ -100,5 +101,14 @@ class GrpcController(
                 result.previousQuestionAnswer?.let { setPreviousAnswer(it) }
             }
             .build()
+    }
+
+    override suspend fun getReport(request: Poll.PollReportRequest): Poll.PollReportResponse {
+        val userId = UserInterceptor.USER_ID_KEY.get()
+        val role = UserInterceptor.ROLE_KEY.get()
+
+        val result = pollService.getReport(PollReportMapper.mapper.protoToDto(request, role, userId))
+
+        return PollReportMapper.mapper.dtoToProto(result)
     }
 }

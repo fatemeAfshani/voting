@@ -13,9 +13,11 @@ class CreatorService(
 ) : CreatorUseCase {
     override fun register(registerDto: RegisterDto): CreatorModel {
         val (phone, password, telegramId) = registerDto
+
+        phone?.let { creatorRepositoryImp.findByPhoneNumber(it) }?.let { return it }
+
         val model = CreatorModel(phone = phone, password = password, telegramId = telegramId)
-        val creator = creatorRepositoryImp.save(model)
-        return creator
+        return creatorRepositoryImp.save(model)
     }
 
     override fun login(registerDto: RegisterDto): CreatorModel {
@@ -32,5 +34,4 @@ class CreatorService(
             ?: throw NotFoundException(Errors.ErrorCodes.USER_NOT_FOUND.name)
         return creator
     }
-
 }

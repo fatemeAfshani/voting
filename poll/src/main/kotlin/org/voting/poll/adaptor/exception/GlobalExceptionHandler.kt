@@ -1,13 +1,12 @@
 package org.voting.poll.adaptor.exception
 
 import io.grpc.ForwardingServerCallListener
-import io.grpc.ServerCall
 import io.grpc.Metadata
+import io.grpc.ServerCall
 import io.grpc.ServerCallHandler
 import io.grpc.ServerInterceptor
 import io.grpc.Status
 import net.devh.boot.grpc.server.interceptor.GrpcGlobalServerInterceptor
-
 
 @GrpcGlobalServerInterceptor
 class GlobalExceptionHandler : ServerInterceptor {
@@ -47,7 +46,9 @@ class GlobalExceptionHandler : ServerInterceptor {
                         Errors.ErrorMessages[Errors.ErrorCodes.UNKNOWN_ERROR.name] ?: "خطای ناشناخته"
                     )
                     call.close(
-                        Status.INTERNAL.withDescription("Unexpected error"), metadata)
+                        Status.INTERNAL.withDescription("Unexpected error"),
+                        metadata
+                    )
                 }
             }
         }

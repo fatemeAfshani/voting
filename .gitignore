@@ -9,6 +9,7 @@
 **/build/
 **/target/  
 **/dist/
+/reports
 # Ignore logs  
 *.log  
 /user/property(org.gradle.api.file.Directory, fixed(class org.gradle.api.internal.file.DefaultFilePropertyFactory$FixedDirectory, /
