@@ -7,9 +7,9 @@ object Errors {
         UNKNOWN_ERROR,
         USER_NOT_FOUND,
         INVALID_ROLE,
-        DUPLICATE_POLL_TITLE
+        DUPLICATE_POLL_TITLE,
+        SELECTED_OPTION_NOT_EXIST
     }
-
 
     val ErrorMessages = mapOf(
         ErrorCodes.FORBIDDEN.name to "شما دسترسی لازم را ندارید",
@@ -17,6 +17,7 @@ object Errors {
         ErrorCodes.UNKNOWN_ERROR.name to "خطای ناشناخته",
         ErrorCodes.USER_NOT_FOUND.name to "کاربر یافت نشد",
         ErrorCodes.INVALID_ROLE.name to "نوع کاربری شما تعریف نشد است",
-        ErrorCodes.DUPLICATE_POLL_TITLE.name to "نظرسنجی با این نام وجود دارد، نام دیگری انتخاب کنید"
+        ErrorCodes.DUPLICATE_POLL_TITLE.name to "نظرسنجی با این نام وجود دارد، نام دیگری انتخاب کنید",
+        ErrorCodes.SELECTED_OPTION_NOT_EXIST.name to "گزینه انتخابی وجود ندارد"
     )
 }

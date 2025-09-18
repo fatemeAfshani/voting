@@ -1,5 +1,7 @@
 package org.voting.poll.domain.poll
 
+import org.voting.poll.adaptor.exception.Errors
+import org.voting.poll.adaptor.exception.InvalidInputException
 import org.voting.poll.domain.poll.enums.PollStatus
 import org.voting.poll.domain.poll.enums.QuestionType
 import java.time.Instant
@@ -33,6 +35,15 @@ data class PollModel(
         this.maxVoters = maxVoters ?: this.maxVoters
         this.preferences = preferences ?: this.preferences
     }
+
+    fun findQuestionIndexById(questionId: String): Int? {
+        val index = questions.indexOfFirst { it.questionId == questionId }
+        return if (index >= 0) index else null
+    }
+
+    fun getQuestionById(questionId: String): PollQuestion? {
+        return questions.firstOrNull { it.questionId == questionId }
+    }
 }
 
 data class PollQuestion(
@@ -42,6 +53,14 @@ data class PollQuestion(
     var options: List<PollOption> = listOf(),
     val shouldAnswer: Boolean = true,
 )
+
+fun PollQuestion.validateAnswerOrThrow(answer: String) {
+    if (questionType == QuestionType.EXPLAIN) return
+    val optionIds = options.map { it.optionId }.toSet()
+    if (!optionIds.contains(answer)) {
+        throw InvalidInputException(Errors.ErrorCodes.SELECTED_OPTION_NOT_EXIST.name)
+    }
+}
 
 data class PollOption(
     var optionId: String = UUID.randomUUID().toString(),
