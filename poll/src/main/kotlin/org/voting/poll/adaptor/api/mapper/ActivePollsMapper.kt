@@ -14,8 +14,6 @@ interface ActivePollsMapper {
         val MAPPER: ActivePollsMapper = Mappers.getMapper(ActivePollsMapper::class.java)
     }
 
-    @Mapping(target = "title", source = "title")
-    @Mapping(target = "description", source = "description")
     @Mapping(target = "preferences", source = "preferences")
     fun toProto(dto: ActivePollsDTO): PollInfo
 

@@ -12,6 +12,7 @@ service PollService {
   rpc closePoll(RequestWithPollId) returns (PollResponse);
   rpc getPollStatus(RequestWithPollId) returns (PollStatusResponse);
   rpc payForPoll(PayForPollRequest) returns (PollResponse);
+  rpc startVoting(StartVotingRequest) returns (StartVotingResponse);
 }
 
 message Empty {}
@@ -21,6 +22,7 @@ message PollInfo {
   string description = 2;
   map<string, string> preferences = 3;
   int32 remainingVoters = 4;
+  string pollId = 5;
 }
 
 message GetActivePollsResponse {
@@ -39,12 +41,27 @@ message UpdatePollRequest {
   optional string title = 4;
   optional string description = 5;
 }
-message AddQuestionRequest {
+
+message AddQuestionRequest{
   string pollId = 1;
   string questionText = 2;
   QuestionType questionType = 3;
   repeated string options = 4;
   bool shouldAnswer = 5;
+}
+
+message Option {
+  string optionId = 1;
+  string optionText = 2;
+}
+
+message Question {
+  string pollId = 1;
+  string questionId =2;
+  string questionText = 3;
+  QuestionType questionType = 4;
+  repeated Option options = 5;
+  bool shouldAnswer = 6;
 }
 message StartPollRequest {
   string pollId = 1;
@@ -63,6 +80,15 @@ message PayForPollRequest {
 message PollResponse {
   string pollId = 1;
   PollStatus status = 2;
+}
+
+message StartVotingRequest {
+  string pollId = 1;
+}
+
+message StartVotingResponse {
+  Question firstQuestion = 1;
+  optional string currentAnswer = 2;
 }
 
 message PollStatusResponse {

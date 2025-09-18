@@ -6,21 +6,27 @@ import org.voting.poll.adaptor.api.mapper.ActivePollsMapper
 import org.voting.poll.adaptor.api.mapper.AddQuestionMapper
 import org.voting.poll.adaptor.api.mapper.CreatePollMapper
 import org.voting.poll.adaptor.api.mapper.PollResponseMapper
+import org.voting.poll.adaptor.api.mapper.StartVotingMapper
 import org.voting.poll.adaptor.api.mapper.UpdatePollMapper
 import org.voting.poll.domain.poll.enums.Roles
 import org.voting.poll.domain.ports.inbound.PollUseCase
+import org.voting.poll.domain.ports.inbound.VoteUseCase
+import poll.Poll
 import poll.Poll.AddQuestionRequest
 import poll.Poll.CreatePollRequest
 import poll.Poll.Empty
 import poll.Poll.GetActivePollsResponse
 import poll.Poll.PollInfo
 import poll.Poll.PollResponse
+import poll.Poll.StartVotingRequest
+import poll.Poll.StartVotingResponse
 import poll.Poll.UpdatePollRequest
 import poll.PollServiceGrpcKt
 
 @GrpcService
 class GrpcController(
-    private val pollService: PollUseCase
+    private val pollService: PollUseCase,
+    private val voteService: VoteUseCase,
 ) : PollServiceGrpcKt.PollServiceCoroutineImplBase() {
     override suspend fun createPoll(request: CreatePollRequest): PollResponse {
         val userId = UserInterceptor.USER_ID_KEY.get()
@@ -60,5 +66,33 @@ class GrpcController(
         return GetActivePollsResponse.newBuilder()
             .addAllPolls(protoPolls)
             .build()
+    }
+
+    override suspend fun startVoting(request: StartVotingRequest): StartVotingResponse {
+        val userId = UserInterceptor.USER_ID_KEY.get()
+        val role = UserInterceptor.ROLE_KEY.get()
+        val mapper = StartVotingMapper.mapper
+
+        val voteResult = voteService.startVoting(
+            mapper.protoToDto(request, role, userId)
+        )
+
+        val firstQuestion = voteResult.firstQuestion
+        val firstQuestionProto = Poll.Question.newBuilder()
+            .setQuestionId(firstQuestion.questionId)
+            .setPollId(voteResult.pollId)
+            .setQuestionType(mapper.mapQuestionType(firstQuestion.questionType))
+            .setQuestionText(firstQuestion.questionText)
+            .setShouldAnswer(firstQuestion.shouldAnswer)
+            .addAllOptions(mapper.mapOption(firstQuestion.options))
+            .build()
+
+        return StartVotingResponse.newBuilder()
+            .apply {
+                voteResult.currentAnswer?.let { setCurrentAnswer(it) }
+                setFirstQuestion(firstQuestionProto)
+            }
+            .build()
+
     }
 }

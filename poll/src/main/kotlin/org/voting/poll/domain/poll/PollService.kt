@@ -1,6 +1,5 @@
 package org.voting.poll.domain.poll
 
-import kotlinx.coroutines.runBlocking
 import org.springframework.stereotype.Service
 import org.voting.poll.adaptor.exception.Errors
 import org.voting.poll.adaptor.exception.ForbiddenException
@@ -17,11 +16,10 @@ import org.voting.poll.domain.ports.inbound.PollUseCase
 import org.voting.poll.domain.ports.outbound.persistance.PollRepository
 import org.voting.poll.domain.ports.outbound.services.UserServiceInterface
 
-
 @Service
 class PollService(
     private val pollRepository: PollRepository,
-    private val userService: UserServiceInterface
+    private val userService: UserServiceInterface,
 ) : PollUseCase {
 
     override fun createPoll(createPollDto: CreatePollDTO): PollModel {
@@ -76,9 +74,8 @@ class PollService(
             if (prefs.isNullOrEmpty()) {
                 true
             } else {
-                // if at least one preference key/value matches, include
                 prefs.any { (k, v) -> voterPreferences[k] == v }
             }
-        }.map { ActivePollsDTO(it?.title, it?.description, it?.preferences) }
+        }.map { ActivePollsDTO(it?.title, it?.description, it?.preferences, it?.id) }
     }
 }

@@ -41,7 +41,6 @@ data class PollQuestion(
     var questionType: QuestionType,
     var options: List<PollOption> = listOf(),
     val shouldAnswer: Boolean = true,
-
 )
 
 data class PollOption(
