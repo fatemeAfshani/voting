@@ -1,25 +1,49 @@
 package bot
 
-import "sync"
+import (
+	"strconv"
+	"sync"
+)
+
+type UserState string
+
+const (
+	StateNone          UserState = ""
+	StateChoosingRole            = "choosing_role"
+	StateChoosingAuth            = "choosing_auth"
+	StateAwaitPhone              = "await_phone"
+	StateAwaitPassword           = "await_password"
+)
+
+type UserSession struct {
+	Role       Option
+	Auth       Option
+	State      UserState
+	Phone      string
+	Password   string
+	TelegramID string
+}
 
 type TokenStore struct {
-	mu     sync.Mutex
-	tokens map[int64]string
+	mu       sync.Mutex
+	sessions map[int64]*UserSession
 }
 
 func NewTokenStore() *TokenStore {
-	return &TokenStore{tokens: make(map[int64]string)}
+	return &TokenStore{
+		sessions: make(map[int64]*UserSession),
+	}
 }
 
-func (s *TokenStore) SaveToken(telegramID int64, token string) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.tokens[telegramID] = token
+func (ts *TokenStore) GetOrCreate(chatID int64) *UserSession {
+	if s, ok := ts.sessions[chatID]; ok {
+		return s
+	}
+	s := &UserSession{TelegramID: strconv.FormatInt(chatID, 10), State: StateNone}
+	ts.sessions[chatID] = s
+	return s
 }
 
-func (s *TokenStore) GetToken(telegramID int64) (string, bool) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	t, ok := s.tokens[telegramID]
-	return t, ok
+func (ts *TokenStore) Set(chatID int64, session *UserSession) {
+	ts.sessions[chatID] = session
 }

@@ -2,6 +2,7 @@ package bot
 
 import (
 	"context"
+	"fmt"
 	"github.com/fatemeAfshani/voting/pkg/log"
 	"github.com/fatemeAfshani/voting/service"
 	"strings"
@@ -51,28 +52,90 @@ func (bot TelegramBot) Start(ctx context.Context) {
 		}
 		chatID := update.Message.Chat.ID
 		text := strings.ToLower(update.Message.Text)
+		session := bot.tokens.GetOrCreate(chatID)
 
-		logger.Trace().Str("actualText", update.Message.Text).Str("processingText", text).Msg("new message received")
+		switch session.State {
+		case StateNone:
+			if text == string(OptionStart) {
+				bot.tokens.Set(chatID, &UserSession{State: StateChoosingRole})
+				bot.sendStep(chatID, StepWelcome)
+			} else {
+				bot.reply(chatID, string(PromptUnknown), false)
+			}
 
-		switch text {
-		case string(OptionStart):
-			bot.sendStep(chatID, StepWelcome)
+		case StateChoosingRole:
+			switch text {
+			case string(OptionCreator), string(OptionVoter):
+				session.Role = Option(text)
+				session.State = StateChoosingAuth
+				bot.tokens.Set(chatID, session)
+				bot.sendStep(chatID, StepSignInOrSignUp)
+			default:
+				bot.reply(chatID, string(PromptUnknown), false)
+			}
 
-		case string(OptionCreator):
-			bot.sendStep(chatID, StepSignInOrSignUp)
+		case StateChoosingAuth:
+			switch text {
+			case string(OptionSignUp), string(OptionSignIn):
+				session.Auth = Option(text)
+				session.State = StateAwaitPhone
+				bot.tokens.Set(chatID, session)
 
-		case string(OptionVoter):
-			bot.sendStep(chatID, StepSignInOrSignUp)
+				if session.Role == OptionCreator && session.Auth == OptionSignUp {
+					bot.sendStep(chatID, StepCreatorSignup)
+				} else if session.Role == OptionCreator && session.Auth == OptionSignIn {
+					bot.sendStep(chatID, StepCreatorSignIn)
+				} else if session.Role == OptionVoter && session.Auth == OptionSignUp {
+					bot.sendStep(chatID, StepVoterSignUp)
+				} else if session.Role == OptionVoter && session.Auth == OptionSignIn {
+					bot.sendStep(chatID, StepVoterSignIn)
+				}
+			default:
+				bot.reply(chatID, string(PromptUnknown), false)
+			}
 
-		case string(OptionSignUp):
-			bot.sendStep(chatID, StepCreatorSignup)
-			// TODO: save user state -> next input is phone
+		case StateAwaitPhone:
+			phone := update.Message.Text
+			session.Phone = phone
 
-		case string(OptionSignIn):
-			bot.sendStep(chatID, StepCreatorSignIn)
+			if session.Auth == OptionSignUp {
+				session.State = StateAwaitPassword
+				bot.tokens.Set(chatID, session)
+				bot.reply(chatID, string(PromptAskPasswordSignUp), true)
+			} else {
+				err := bot.service.SignIn(session.TelegramID)
+				if err != nil {
+					bot.reply(chatID, "❌ Sign-in failed: "+err.Error(), false)
+				} else {
+					bot.reply(chatID, "✅ You are signed in successfully!", false)
+				}
+			}
 
-		default:
-			bot.reply(chatID, string(PromptUnknown), false)
+			session.State = StateNone
+			bot.tokens.Set(chatID, session)
+
+		case StateAwaitPassword:
+			password := update.Message.Text
+			session.Password = password
+
+			if session.Auth == OptionSignUp {
+				err := bot.service.SignUp(session.Phone, session.Password, session.TelegramID)
+				if err != nil {
+					bot.reply(chatID, fmt.Sprintf("❌ error in registering. %v", err.Error()), false)
+				} else {
+					bot.reply(chatID, "You are signed up successfully!", false)
+				}
+			} else {
+				err := bot.service.SignIn(session.TelegramID)
+				if err != nil {
+					bot.reply(chatID, "❌ Sign-in failed: "+err.Error(), false)
+				} else {
+					bot.reply(chatID, "✅ You are signed in successfully!", false)
+				}
+			}
+
+			session.State = StateNone
+			bot.tokens.Set(chatID, session)
 		}
 	}
 }
