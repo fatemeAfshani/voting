@@ -9,11 +9,12 @@ type Option string
 type PromptText string
 
 const (
-	PromptWelcome        PromptText = "Welcome! Are you a *Creator* or *Voter*?"
-	PromptSignInOrSignUp PromptText = "Do you want to *Sign up* or *Sign in*?"
-	PromptAskPhoneSignUp PromptText = "Please send me your phone number (international format) to *Sign up*."
-	PromptAskPhoneSignIn PromptText = "Please send me your phone number to *Sign in*."
-	PromptUnknown        PromptText = "I didn’t understand. Use /start."
+	PromptWelcome           PromptText = "Welcome! Are you a *Creator* or *Voter*?"
+	PromptSignInOrSignUp    PromptText = "Do you want to *Sign up* or *Sign in*?"
+	PromptAskPhoneSignUp    PromptText = "Please send me your phone number (international format) to *Sign up*."
+	PromptAskPasswordSignUp PromptText = "Now, please send me a *password* for your account."
+	PromptAskPhoneSignIn    PromptText = "Please send me your phone number to *Sign in*."
+	PromptUnknown           PromptText = "I didn’t understand. Use /start."
 )
 
 const (
