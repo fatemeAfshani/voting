@@ -48,11 +48,25 @@ func (bot TelegramBot) Start(ctx context.Context) {
 	//todo write this data into queue for scalability
 	for update := range updates {
 		if update.Message == nil {
+			logger.Warn().
+				Int("updateId", update.UpdateID).
+				Int64("chatId", update.Message.Chat.ID).
+				Msg("update msg is nil")
+
 			continue
 		}
+
+		logger = logger.With().
+			Int("updateId", update.UpdateID).
+			Int64("chatId", update.Message.Chat.ID).
+			Str("text", update.Message.Text).
+			Logger()
+
 		chatID := update.Message.Chat.ID
 		text := strings.ToLower(update.Message.Text)
 		session := bot.tokens.GetOrCreate(chatID)
+
+		logger.Info().Str("state", string(session.State)).Msg("new message received")
 
 		switch session.State {
 		case StateNone:
@@ -103,8 +117,7 @@ func (bot TelegramBot) Start(ctx context.Context) {
 				bot.tokens.Set(chatID, session)
 				bot.reply(chatID, string(PromptAskPasswordSignUp), true)
 			} else {
-				//todo we should create context by timeout
-				err := bot.service.SignIn(context.Background(), session.TelegramID)
+				err := bot.service.SignIn(ctx, session.TelegramID)
 				if err != nil {
 					bot.reply(chatID, "❌ Sign-in failed: "+err.Error(), false)
 				} else {
@@ -120,14 +133,14 @@ func (bot TelegramBot) Start(ctx context.Context) {
 			session.Password = password
 
 			if session.Auth == OptionSignUp {
-				err := bot.service.SignUp(context.Background(), session.Phone, session.Password, session.TelegramID)
+				err := bot.service.SignUp(ctx, session.Phone, session.Password, session.TelegramID)
 				if err != nil {
 					bot.reply(chatID, fmt.Sprintf("❌ error in registering. %v", err.Error()), false)
 				} else {
 					bot.reply(chatID, "You are signed up successfully!", false)
 				}
 			} else {
-				err := bot.service.SignIn(context.Background(), session.TelegramID)
+				err := bot.service.SignIn(ctx, session.TelegramID)
 				if err != nil {
 					bot.reply(chatID, "❌ Sign-in failed: "+err.Error(), false)
 				} else {
@@ -142,6 +155,8 @@ func (bot TelegramBot) Start(ctx context.Context) {
 }
 
 func (bot TelegramBot) sendStep(chatID int64, step StepMessage) {
+	logger := log.Get().With().Str("package", "bot").Str("function", "sendStep").Logger()
+
 	if len(step.Options) > 0 {
 		var rows [][]tgbotapi.KeyboardButton
 		for _, opt := range step.Options {
@@ -156,18 +171,32 @@ func (bot TelegramBot) sendStep(chatID int64, step StepMessage) {
 			ResizeKeyboard:  true,
 			OneTimeKeyboard: true,
 		}
-		bot.telegramBot.Send(msg)
+		_, err := bot.telegramBot.Send(msg)
+		if err != nil {
+			logger.Err(err).
+				Str("text", string(step.Text)).
+				Int64("chatId", chatID).
+				Msg("error in sending message the message")
+		}
 	} else {
 		bot.reply(chatID, string(step.Text), true)
 	}
 }
 
 func (bot TelegramBot) reply(chatID int64, text string, markdown bool) {
+	logger := log.Get().With().Str("package", "bot").Str("function", "reply").Logger()
+
 	msg := tgbotapi.NewMessage(chatID, text)
 	if markdown {
 		msg.ParseMode = "Markdown"
 	}
-	bot.telegramBot.Send(msg)
+	_, err := bot.telegramBot.Send(msg)
+	if err != nil {
+		logger.Err(err).
+			Str("text", text).
+			Int64("chatId", chatID).
+			Msg("error in replying the message")
+	}
 }
 
 func (bot TelegramBot) Stop() {
