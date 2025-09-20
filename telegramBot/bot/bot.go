@@ -103,30 +103,31 @@ func (bot TelegramBot) Start(ctx context.Context) {
 				bot.tokens.Set(chatID, session)
 				bot.reply(chatID, string(PromptAskPasswordSignUp), true)
 			} else {
-				err := bot.service.SignIn(session.TelegramID)
+				//todo we should create context by timeout
+				err := bot.service.SignIn(context.Background(), session.TelegramID)
 				if err != nil {
 					bot.reply(chatID, "❌ Sign-in failed: "+err.Error(), false)
 				} else {
 					bot.reply(chatID, "✅ You are signed in successfully!", false)
 				}
-			}
 
-			session.State = StateNone
-			bot.tokens.Set(chatID, session)
+				session.State = StateNone
+				bot.tokens.Set(chatID, session)
+			}
 
 		case StateAwaitPassword:
 			password := update.Message.Text
 			session.Password = password
 
 			if session.Auth == OptionSignUp {
-				err := bot.service.SignUp(session.Phone, session.Password, session.TelegramID)
+				err := bot.service.SignUp(context.Background(), session.Phone, session.Password, session.TelegramID)
 				if err != nil {
 					bot.reply(chatID, fmt.Sprintf("❌ error in registering. %v", err.Error()), false)
 				} else {
 					bot.reply(chatID, "You are signed up successfully!", false)
 				}
 			} else {
-				err := bot.service.SignIn(session.TelegramID)
+				err := bot.service.SignIn(context.Background(), session.TelegramID)
 				if err != nil {
 					bot.reply(chatID, "❌ Sign-in failed: "+err.Error(), false)
 				} else {

@@ -36,6 +36,9 @@ func NewTokenStore() *TokenStore {
 }
 
 func (ts *TokenStore) GetOrCreate(chatID int64) *UserSession {
+	defer ts.mu.Unlock()
+
+	ts.mu.Lock()
 	if s, ok := ts.sessions[chatID]; ok {
 		return s
 	}
@@ -45,5 +48,8 @@ func (ts *TokenStore) GetOrCreate(chatID int64) *UserSession {
 }
 
 func (ts *TokenStore) Set(chatID int64, session *UserSession) {
+	defer ts.mu.Unlock()
+
+	ts.mu.Lock()
 	ts.sessions[chatID] = session
 }
