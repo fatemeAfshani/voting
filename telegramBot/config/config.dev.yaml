@@ -5,7 +5,7 @@ grpc_client:
   port: 9090
 
 telegram_bot:
-  token: 7965724131:AAH0j420CXkPibXyKcgzqAH3cTqiivQh8a8
+  token: myToken
 
 logger:
   file_path: "logs/bot.log"
