@@ -9,11 +9,11 @@ make sure to have correct package name inside your .proto file.
 option go_package = "contract/user/golang";
 ### How to generate .go files from .proto file
 ```bash
-protoc --go_out=. --go-grpc_out=. contract/[YOUR_SERVICE]/proto/[YOUR_PROTO_FILE.proto]
+protoc --go_out=. --go-grpc_out=. protos/[YOUR_SERVICE]/proto/[YOUR_PROTO_FILE.proto]
 ```
 #### Example:
 ```bash
-protoc --go_out=. --go-grpc_out=. contract/user/proto/user.proto
+protoc --go_out=. --go-grpc_out=. protos/user/proto/user.proto
 ```
 
 Happy coding! 🚀

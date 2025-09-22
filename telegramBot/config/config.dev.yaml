@@ -1,0 +1,17 @@
+total_shutdown_timeout: 5s
+
+grpc_client:
+  host: localhost
+  port: 9090
+
+telegram_bot:
+  token: 7965724131:AAH0j420CXkPibXyKcgzqAH3cTqiivQh8a8
+
+logger:
+  file_path: "logs/bot.log"
+  use_local_time: true
+  file_max_size_in_mb: 10
+  file_max_age_in_days: 7
+  level: -1 # trace
+  compress: true
+  file_max_backups: 10
