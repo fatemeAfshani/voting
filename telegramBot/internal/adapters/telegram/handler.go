@@ -3,6 +3,7 @@ package telegram
 import (
 	"context"
 	"fmt"
+	"github.com/fatemeAfshani/voting/internal/domain"
 	log "github.com/fatemeAfshani/voting/internal/infra/logger"
 	"github.com/fatemeAfshani/voting/internal/service"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -16,7 +17,7 @@ type Config struct {
 type TelegramBot struct {
 	service     service.Service
 	config      Config
-	tokens      *TokenStore
+	tokens      *domain.TokenStore
 	telegramBot *tgbotapi.BotAPI
 }
 
@@ -29,7 +30,7 @@ func NewTelegramBot(config Config, service service.Service) (TelegramBot, error)
 	return TelegramBot{
 		service:     service,
 		config:      config,
-		tokens:      NewTokenStore(),
+		tokens:      domain.NewTokenStore(),
 		telegramBot: botApi,
 	}, nil
 }
@@ -69,34 +70,34 @@ func (bot TelegramBot) Start(ctx context.Context) {
 		logger.Info().Str("state", string(session.State)).Msg("new message received")
 
 		switch session.State {
-		case StateNone:
+		case domain.StateNone:
 			if text == string(OptionStart) {
-				bot.tokens.Set(chatID, &UserSession{State: StateChoosingRole})
+				bot.tokens.Set(chatID, &domain.UserSession{State: domain.StateChoosingRole})
 				bot.sendStep(chatID, StepWelcome)
 			} else {
 				bot.reply(chatID, string(PromptUnknown), false)
 			}
 
-		case StateChoosingRole:
+		case domain.StateChoosingRole:
 			switch text {
 			case OptionCreator:
-				session.Role = Creator
-				session.State = StateChoosingAuth
+				session.Role = domain.Creator
+				session.State = domain.StateChoosingAuth
 				bot.tokens.Set(chatID, session)
 				bot.sendStep(chatID, StepSignInOrSignUp)
 			case OptionVoter:
-				session.Role = Voter
-				session.State = StateChoosingAuth
+				session.Role = domain.Voter
+				session.State = domain.StateChoosingAuth
 				bot.tokens.Set(chatID, session)
 				bot.sendStep(chatID, StepSignInOrSignUp)
 			default:
 				bot.reply(chatID, PromptUnknown, false)
 			}
 
-		case StateChoosingAuth:
+		case domain.StateChoosingAuth:
 			switch text {
 			case OptionSignUp, OptionSignIn:
-				session.State = StateAwaitPhone
+				session.State = domain.StateAwaitPhone
 				bot.tokens.Set(chatID, session)
 
 				if session.Role == OptionCreator && session.Auth == OptionSignUp {
@@ -112,12 +113,12 @@ func (bot TelegramBot) Start(ctx context.Context) {
 				bot.reply(chatID, string(PromptUnknown), false)
 			}
 
-		case StateAwaitPhone:
+		case domain.StateAwaitPhone:
 			phone := update.Message.Text
 			session.Phone = phone
 
 			if session.Auth == OptionSignUp {
-				session.State = StateAwaitPassword
+				session.State = domain.StateAwaitPassword
 				bot.tokens.Set(chatID, session)
 				bot.reply(chatID, PromptAskPasswordSignUp, true)
 			} else {
@@ -128,11 +129,11 @@ func (bot TelegramBot) Start(ctx context.Context) {
 					bot.reply(chatID, "✅ You are signed in successfully!", false)
 				}
 
-				session.State = StateNone
+				session.State = domain.StateNone
 				bot.tokens.Set(chatID, session)
 			}
 
-		case StateAwaitPassword:
+		case domain.StateAwaitPassword:
 			password := update.Message.Text
 			session.Password = password
 
@@ -152,7 +153,7 @@ func (bot TelegramBot) Start(ctx context.Context) {
 				}
 			}
 
-			session.State = StateNone
+			session.State = domain.StateNone
 			bot.tokens.Set(chatID, session)
 		}
 	}

@@ -1,6 +1,7 @@
-package telegram
+package domain
 
 import (
+	"github.com/fatemeAfshani/voting/internal/adapters/telegram"
 	"strconv"
 	"sync"
 )
@@ -24,7 +25,7 @@ const (
 
 type UserSession struct {
 	Role       Role
-	Auth       Option
+	Auth       telegram.Option
 	State      UserState
 	Phone      string
 	Password   string
