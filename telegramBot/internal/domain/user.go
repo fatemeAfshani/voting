@@ -31,3 +31,16 @@ func (d *UserDomain) AutoSignIn(ctx context.Context, session *UserSession) (bool
 	}
 	return false, nil
 }
+
+func (d *UserDomain) RegisterCreator(ctx context.Context, session *UserSession) (bool, error) {
+	if session.Phone != "" && session.Password != "" {
+		response, err := d.userService.CreatorRegister(ctx, ports.SignUpRequest{Phone: session.Phone, Password: session.Password, TelegramId: session.TelegramID})
+		if err != nil {
+			d.logger.Error().Msg("unable to signIn automatically")
+			return false, err
+		}
+		session.UserToken = response.Token
+		return true, err
+	}
+	return false, nil
+}

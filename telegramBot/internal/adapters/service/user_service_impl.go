@@ -49,17 +49,19 @@ func (c *UserServiceImp) CreatorSignIn(ctx context.Context, request ports.SignIn
 	}, nil
 }
 
-func (c *UserServiceImp) VoterSignIn(ctx context.Context, request ports.SignInRequest) (ports.SignInResponse, error) {
-	req := &golang.TelegramLoginRequest{
+func (c *UserServiceImp) CreatorRegister(ctx context.Context, request ports.SignUpRequest) (ports.SignUpResponse, error) {
+	req := &golang.RegisterRequest{
+		Phone:      request.Phone,
+		Password:   request.Password,
 		TelegramId: request.TelegramId,
 	}
 
-	res, err := c.voterClient.LoginWithTelegram(ctx, req, []grpc.CallOption{}...)
+	res, err := c.creatorClient.Register(context.Background(), req)
 	if err != nil || res == nil {
-		return ports.SignInResponse{}, err
+		return ports.SignUpResponse{}, err
 	}
 
-	return ports.SignInResponse{
+	return ports.SignUpResponse{
 		Token: res.GetToken(),
 		Id:    res.GetId(),
 	}, nil

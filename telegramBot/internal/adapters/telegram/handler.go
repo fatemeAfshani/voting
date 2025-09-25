@@ -72,10 +72,10 @@ func (bot *Bot) Start(ctx context.Context) {
 			bot.handleStateNone(chatId, session, text)
 		case domain.StateChoosingRole:
 			bot.handleChoosingRole(ctx, chatId, session, text)
-			//case domain.StateAwaitPhone:
-			//	bot.handleAwaitPhone(ctx, chatId, session, update.Message.Text)
-			//case domain.StateAwaitPassword:
-			//	bot.handleAwaitPassword(ctx, chatId, session, update.Message.Text)
+		case domain.StateAwaitPhone:
+			bot.handleAwaitPhone(chatId, session, update.Message.Text)
+		case domain.StateAwaitPassword:
+			bot.handleAwaitPassword(ctx, chatId, session, update)
 		}
 	}
 }
@@ -104,8 +104,9 @@ func (bot *Bot) handleChoosingRole(ctx context.Context, chatID int64, session *d
 			bot.tokens.Set(chatID, session)
 			if isSignedIn {
 				bot.messenger.SendStep(chatID, StepCreatorMenu)
+			} else {
+				bot.messenger.SendStep(chatID, StepCreatorSignup)
 			}
-			bot.messenger.SendStep(chatID, StepCreatorSignup)
 
 		case OptionVoter:
 			session.Role = domain.Voter
@@ -120,48 +121,31 @@ func (bot *Bot) handleChoosingRole(ctx context.Context, chatID int64, session *d
 	bot.messenger.Reply(chatID, bot.messenger.localize(MsgUnknown), false)
 }
 
-//func (bot *TelegramBot) handleAwaitPhone(ctx context.Context, chatID int64, session *domain.UserSession, phone string) {
-//	session.Phone = phone
-//
-//	if session.Auth == string(OptionSignUp) {
-//		session.State = domain.StateAwaitPassword
-//		bot.tokens.Set(chatID, session)
-//		bot.messenger.Reply(chatID, bot.messenger.localize(MsgAskPasswordSignUp), true)
-//		return
-//	}
-//
-//	err := bot.service.SignIn(ctx, session.TelegramID)
-//	if err != nil {
-//		bot.messenger.ReplyID(chatID, MsgSignInFailed, false, map[string]any{"err": err.Error()})
-//	} else {
-//		bot.messenger.Reply(chatID, bot.messenger.localize(MsgSignInSuccess), false)
-//	}
-//	session.State = domain.StateNone
-//	bot.tokens.Set(chatID, session)
-//}
+func (bot *Bot) handleAwaitPhone(chatID int64, session *domain.UserSession, phone string) {
+	session.Phone = phone
+	session.State = domain.StateAwaitPassword
+	bot.tokens.Set(chatID, session)
+	bot.messenger.Reply(chatID, bot.messenger.localize(MsgAskPasswordSignUp), true)
+	return
+}
 
-//func (bot *TelegramBot) handleAwaitPassword(ctx context.Context, chatID int64, session *domain.UserSession, password string) {
-//	session.Password = password
-//
-//	if session.Auth == string(OptionSignUp) {
-//		err := bot.service.SignUp(ctx, session.Phone, session.Password, session.TelegramID)
-//		if err != nil {
-//			bot.messenger.ReplyID(chatID, MsgRegisterError, false, map[string]any{"err": err.Error()})
-//		} else {
-//			bot.messenger.Reply(chatID, bot.messenger.localize(MsgSignUpSuccess), false)
-//		}
-//	} else {
-//		err := bot.service.SignIn(ctx, session.TelegramID)
-//		if err != nil {
-//			bot.messenger.ReplyID(chatID, MsgSignInFailed, false, map[string]any{"err": err.Error()})
-//		} else {
-//			bot.messenger.Reply(chatID, bot.messenger.localize(MsgSignInSuccess), false)
-//		}
-//	}
-//
-//	session.State = domain.StateNone
-//	bot.tokens.Set(chatID, session)
-//}
+func (bot *Bot) handleAwaitPassword(ctx context.Context, chatID int64, session *domain.UserSession, updateData tgbotapi.Update) {
+	session.Password = updateData.Message.Text
+	session.UserName = updateData.Message.From.FirstName
+
+	isRegistered, _ := bot.userDomain.RegisterCreator(ctx, session)
+	if isRegistered {
+		session.State = domain.StateCreatorMenu
+	} else {
+		session.State = domain.StateNone
+	}
+	bot.tokens.Set(chatID, session)
+	if isRegistered {
+		bot.messenger.SendStep(chatID, StepCreatorMenu)
+	} else {
+		bot.messenger.Reply(chatID, bot.messenger.localize(MsgRegisterError), true)
+	}
+}
 
 func (bot *Bot) Stop() {
 	bot.telegramBot.StopReceivingUpdates()
