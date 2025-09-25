@@ -1,10 +1,11 @@
 package config
 
 import (
+	"time"
+
 	"github.com/fatemeAfshani/voting/internal/adapters/telegram"
 	"github.com/fatemeAfshani/voting/internal/infra/grpc"
 	"github.com/fatemeAfshani/voting/internal/infra/logger"
-	"time"
 )
 
 type Config struct {

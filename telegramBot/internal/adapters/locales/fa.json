@@ -1,0 +1,18 @@
+[
+  {"id":"prompt.welcome","translation":"خوش آمدید! نقش خود را انتخاب کنید: خالق یا رای‌دهنده؟"},
+  {"id":"prompt.signin_or_signup","translation":"می‌خواهید ثبت‌نام کنید یا وارد شوید؟"},
+  {"id":"prompt.ask_phone_signup","translation":"برای ثبت‌نام، شماره تلفن خود را ارسال کنید."},
+  {"id":"prompt.ask_password_signup","translation":"لطفاً یک گذرواژه برای حساب خود ارسال کنید."},
+  {"id":"prompt.ask_phone_signin","translation":"برای ورود، شماره تلفن خود را ارسال کنید."},
+  {"id":"prompt.unknown","translation":"متوجه نشدم. از /start استفاده کنید."},
+  {"id":"signin.success","translation":"✅ با موفقیت وارد شدید!"},
+  {"id":"signin.failed","translation":"❌ ورود ناموفق بود: {{.err}}"},
+  {"id":"signup.success","translation":"ثبت‌نام شما با موفقیت انجام شد!"},
+  {"id":"register.error","translation":"❌ خطا در ثبت‌نام: {{.err}}"},
+
+  {"id":"option.creator","translation":"خالق"},
+  {"id":"option.voter","translation":"رأی‌دهنده"},
+  {"id":"option.signup","translation":"ثبت‌نام"},
+  {"id":"option.signin","translation":"ورود"}
+]
+

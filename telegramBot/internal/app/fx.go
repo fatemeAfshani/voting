@@ -3,21 +3,23 @@ package app
 import (
 	"context"
 	"fmt"
+	"os"
 	"path/filepath"
 
-	"os"
+	"github.com/fatemeAfshani/voting/internal/domain"
 
 	grpcAdapter "github.com/fatemeAfshani/voting/internal/adapters/grpc"
 	"github.com/fatemeAfshani/voting/internal/adapters/telegram"
 	"github.com/fatemeAfshani/voting/internal/config"
-	"github.com/fatemeAfshani/voting/internal/domain"
 	configMapper "github.com/fatemeAfshani/voting/internal/infra/config"
 	grpcClient "github.com/fatemeAfshani/voting/internal/infra/grpc"
 	log "github.com/fatemeAfshani/voting/internal/infra/logger"
 	"github.com/fatemeAfshani/voting/internal/ports"
 	"github.com/fatemeAfshani/voting/internal/service"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"go.uber.org/fx"
+	"golang.org/x/text/language"
 	"google.golang.org/grpc"
 )
 
@@ -81,8 +83,30 @@ func ProvideTokenStore() *domain.TokenStore {
 	return domain.NewTokenStore()
 }
 
-func ProvideMessenger(bot *tgbotapi.BotAPI, logger log.Logger) telegram.Messenger {
-	return telegram.NewMessenger(bot, logger)
+func ProvideMessenger(bot *tgbotapi.BotAPI, logger log.Logger, loc *i18n.Localizer) telegram.Messenger {
+	return telegram.NewMessenger(bot, logger, loc)
+}
+
+func ProvideBundle() (*i18n.Bundle, error) {
+	b := i18n.NewBundle(language.Persian)
+	wd, err := os.Getwd()
+	if err != nil {
+		return nil, fmt.Errorf("i18n: getwd failed: %w", err)
+	}
+	files := []string{
+		filepath.Join(wd, "internal", "adapters", "locales", "fa.json"),
+		filepath.Join(wd, "internal", "adapters", "locales", "en.json"),
+	}
+	for _, f := range files {
+		if _, err := b.LoadMessageFile(f); err != nil {
+			return nil, fmt.Errorf("i18n: failed to load locale file %s: %w", f, err)
+		}
+	}
+	return b, nil
+}
+
+func ProvideLocalizer(bundle *i18n.Bundle) *i18n.Localizer {
+	return i18n.NewLocalizer(bundle, language.Persian.String(), language.English.String())
 }
 
 func RunTelegramBot(lc fx.Lifecycle, bot telegram.TelegramBot, logger log.Logger, cfg config.Config) {
@@ -109,6 +133,8 @@ var Module = fx.Options(
 		ProvideService,
 		ProvideTGBotAPI,
 		ProvideTokenStore,
+		ProvideBundle,
+		ProvideLocalizer,
 		ProvideMessenger,
 		ProvideTelegramBot,
 	),

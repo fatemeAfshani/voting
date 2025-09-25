@@ -29,6 +29,7 @@ type UserSession struct {
 	Phone      string
 	Password   string
 	TelegramID string
+	Lang       string
 }
 
 type TokenStore struct {
@@ -49,7 +50,7 @@ func (ts *TokenStore) GetOrCreate(chatID int64) *UserSession {
 	if s, ok := ts.sessions[chatID]; ok {
 		return s
 	}
-	s := &UserSession{TelegramID: strconv.FormatInt(chatID, 10), State: StateNone}
+	s := &UserSession{TelegramID: strconv.FormatInt(chatID, 10), State: StateNone, Lang: "fa"}
 	ts.sessions[chatID] = s
 	return s
 }

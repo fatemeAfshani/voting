@@ -1,56 +1,44 @@
 package telegram
 
 type StepMessage struct {
-	Text    PromptText
+	TextID  string
 	Options []Option
 }
 
 type Option string
-type PromptText string
 
 const (
-	PromptWelcome           PromptText = "Welcome! Are you a *Creator* or *Voter*?"
-	PromptSignInOrSignUp               = "Do you want to *Sign up* or *Sign in*?"
-	PromptAskPhoneSignUp               = "Please send me your phone number (international format) to *Sign up*."
-	PromptAskPasswordSignUp            = "Now, please send me a *password* for your account."
-	PromptAskPhoneSignIn               = "Please send me your phone number to *Sign in*."
-	PromptUnknown                      = "I didn’t understand. Use /start."
+	MsgWelcome           = "prompt.welcome"
+	MsgSignInOrSignUp    = "prompt.signin_or_signup"
+	MsgAskPhoneSignUp    = "prompt.ask_phone_signup"
+	MsgAskPasswordSignUp = "prompt.ask_password_signup"
+	MsgAskPhoneSignIn    = "prompt.ask_phone_signin"
+	MsgUnknown           = "prompt.unknown"
+	MsgSignInSuccess     = "signin.success"
+	MsgSignInFailed      = "signin.failed"
+	MsgSignUpSuccess     = "signup.success"
+	MsgRegisterError     = "register.error"
 )
 
 const (
 	OptionStart   Option = "/start"
-	OptionCreator        = "creator"
-	OptionVoter          = "voter"
-	OptionSignUp         = "signup"
-	OptionSignIn         = "signin"
+	OptionCreator        = "option.creator"
+	OptionVoter          = "option.voter"
+	OptionSignUp         = "option.signup"
+	OptionSignIn         = "option.signin"
 )
 
 var StepWelcome = StepMessage{
-	Text:    PromptWelcome,
+	TextID:  MsgWelcome,
 	Options: []Option{OptionCreator, OptionVoter},
 }
 
 var StepSignInOrSignUp = StepMessage{
-	Text:    PromptSignInOrSignUp,
+	TextID:  MsgSignInOrSignUp,
 	Options: []Option{OptionSignUp, OptionSignIn},
 }
 
-var StepCreatorSignup = StepMessage{
-	Text:    PromptAskPhoneSignUp,
-	Options: nil,
-}
-
-var StepCreatorSignIn = StepMessage{
-	Text:    PromptAskPhoneSignIn,
-	Options: nil,
-}
-
-var StepVoterSignUp = StepMessage{
-	Text:    PromptAskPhoneSignUp,
-	Options: nil,
-}
-
-var StepVoterSignIn = StepMessage{
-	Text:    PromptAskPhoneSignIn,
-	Options: nil,
-}
+var StepCreatorSignup = StepMessage{TextID: MsgAskPhoneSignUp}
+var StepCreatorSignIn = StepMessage{TextID: MsgAskPhoneSignIn}
+var StepVoterSignUp = StepMessage{TextID: MsgAskPhoneSignUp}
+var StepVoterSignIn = StepMessage{TextID: MsgAskPhoneSignIn}
