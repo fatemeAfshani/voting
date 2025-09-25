@@ -3,11 +3,12 @@ package telegram
 import (
 	"context"
 	"fmt"
+	"strings"
+
 	"github.com/fatemeAfshani/voting/internal/domain"
 	log "github.com/fatemeAfshani/voting/internal/infra/logger"
 	"github.com/fatemeAfshani/voting/internal/service"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"strings"
 )
 
 type Config struct {
@@ -19,24 +20,23 @@ type TelegramBot struct {
 	config      Config
 	tokens      *domain.TokenStore
 	telegramBot *tgbotapi.BotAPI
+	messenger   Messenger
+	logger      log.Logger
 }
 
-func NewTelegramBot(config Config, service service.Service) (TelegramBot, error) {
-	botApi, err := tgbotapi.NewBotAPI(config.Token)
-	if err != nil || botApi == nil {
-		return TelegramBot{}, err
-	}
-
+func NewTelegramBot(config Config, service service.Service, botApi *tgbotapi.BotAPI, tokens *domain.TokenStore, messenger Messenger, logger log.Logger) TelegramBot {
 	return TelegramBot{
 		service:     service,
 		config:      config,
-		tokens:      domain.NewTokenStore(),
+		tokens:      tokens,
 		telegramBot: botApi,
-	}, nil
+		messenger:   messenger,
+		logger:      logger,
+	}
 }
 
 func (bot TelegramBot) Start(ctx context.Context) {
-	logger := log.Get().With().Str("package", "bot").Str("function", "start").Logger()
+	logger := bot.logger.With().Str("package", "bot").Str("function", "start").Logger()
 
 	//todo due to documentation we should put offset = UpdateId + 1
 	u := tgbotapi.NewUpdate(0)
@@ -46,12 +46,10 @@ func (bot TelegramBot) Start(ctx context.Context) {
 	logger.Info().Msg("bot started")
 
 	//todo write this data into queue for scalability
-	//todo: must separate each of these in a service function
 	for update := range updates {
 		if update.Message == nil {
 			logger.Warn().
 				Int("updateId", update.UpdateID).
-				Int64("chatId", update.Message.Chat.ID).
 				Msg("update msg is nil")
 
 			continue
@@ -71,137 +69,107 @@ func (bot TelegramBot) Start(ctx context.Context) {
 
 		switch session.State {
 		case domain.StateNone:
-			if text == string(OptionStart) {
-				bot.tokens.Set(chatID, &domain.UserSession{State: domain.StateChoosingRole})
-				bot.sendStep(chatID, StepWelcome)
-			} else {
-				bot.reply(chatID, string(PromptUnknown), false)
-			}
-
+			bot.handleStateNone(chatID, text)
 		case domain.StateChoosingRole:
-			switch text {
-			case OptionCreator:
-				session.Role = domain.Creator
-				session.State = domain.StateChoosingAuth
-				bot.tokens.Set(chatID, session)
-				bot.sendStep(chatID, StepSignInOrSignUp)
-			case OptionVoter:
-				session.Role = domain.Voter
-				session.State = domain.StateChoosingAuth
-				bot.tokens.Set(chatID, session)
-				bot.sendStep(chatID, StepSignInOrSignUp)
-			default:
-				bot.reply(chatID, PromptUnknown, false)
-			}
-
+			bot.handleChoosingRole(chatID, session, text)
 		case domain.StateChoosingAuth:
-			switch text {
-			case OptionSignUp, OptionSignIn:
-				session.State = domain.StateAwaitPhone
-				bot.tokens.Set(chatID, session)
-
-				if session.Role == OptionCreator && session.Auth == OptionSignUp {
-					bot.sendStep(chatID, StepCreatorSignup)
-				} else if session.Role == OptionCreator && session.Auth == OptionSignIn {
-					bot.sendStep(chatID, StepCreatorSignIn)
-				} else if session.Role == OptionVoter && session.Auth == OptionSignUp {
-					bot.sendStep(chatID, StepVoterSignUp)
-				} else if session.Role == OptionVoter && session.Auth == OptionSignIn {
-					bot.sendStep(chatID, StepVoterSignIn)
-				}
-			default:
-				bot.reply(chatID, string(PromptUnknown), false)
-			}
-
+			bot.handleChoosingAuth(ctx, chatID, session, text)
 		case domain.StateAwaitPhone:
-			phone := update.Message.Text
-			session.Phone = phone
-
-			if session.Auth == OptionSignUp {
-				session.State = domain.StateAwaitPassword
-				bot.tokens.Set(chatID, session)
-				bot.reply(chatID, PromptAskPasswordSignUp, true)
-			} else {
-				err := bot.service.SignIn(ctx, session.TelegramID)
-				if err != nil {
-					bot.reply(chatID, "❌ Sign-in failed: "+err.Error(), false)
-				} else {
-					bot.reply(chatID, "✅ You are signed in successfully!", false)
-				}
-
-				session.State = domain.StateNone
-				bot.tokens.Set(chatID, session)
-			}
-
+			bot.handleAwaitPhone(ctx, chatID, session, update.Message.Text)
 		case domain.StateAwaitPassword:
-			password := update.Message.Text
-			session.Password = password
-
-			if session.Auth == OptionSignUp {
-				err := bot.service.SignUp(ctx, session.Phone, session.Password, session.TelegramID)
-				if err != nil {
-					bot.reply(chatID, fmt.Sprintf("❌ error in registering. %v", err.Error()), false)
-				} else {
-					bot.reply(chatID, "You are signed up successfully!", false)
-				}
-			} else {
-				err := bot.service.SignIn(ctx, session.TelegramID)
-				if err != nil {
-					bot.reply(chatID, "❌ Sign-in failed: "+err.Error(), false)
-				} else {
-					bot.reply(chatID, "✅ You are signed in successfully!", false)
-				}
-			}
-
-			session.State = domain.StateNone
-			bot.tokens.Set(chatID, session)
+			bot.handleAwaitPassword(ctx, chatID, session, update.Message.Text)
 		}
 	}
 }
 
-func (bot TelegramBot) sendStep(chatID int64, step StepMessage) {
-	logging := log.Get().With().Str("package", "bot").Str("function", "sendStep").Logger()
+func (bot TelegramBot) handleStateNone(chatID int64, text string) {
+	if text == string(OptionStart) {
+		bot.tokens.Set(chatID, &domain.UserSession{State: domain.StateChoosingRole})
+		bot.messenger.SendStep(chatID, StepWelcome)
+		return
+	}
+	bot.messenger.Reply(chatID, string(PromptUnknown), false)
+}
 
-	if len(step.Options) > 0 {
-		var rows [][]tgbotapi.KeyboardButton
-		for _, opt := range step.Options {
-			rows = append(rows, tgbotapi.NewKeyboardButtonRow(
-				tgbotapi.NewKeyboardButton(string(opt)),
-			))
+func (bot TelegramBot) handleChoosingRole(chatID int64, session *domain.UserSession, text string) {
+	switch text {
+	case OptionCreator:
+		session.Role = domain.Creator
+		session.State = domain.StateChoosingAuth
+		bot.tokens.Set(chatID, session)
+		bot.messenger.SendStep(chatID, StepSignInOrSignUp)
+	case OptionVoter:
+		session.Role = domain.Voter
+		session.State = domain.StateChoosingAuth
+		bot.tokens.Set(chatID, session)
+		bot.messenger.SendStep(chatID, StepSignInOrSignUp)
+	default:
+		bot.messenger.Reply(chatID, string(PromptUnknown), false)
+	}
+}
+
+func (bot TelegramBot) handleChoosingAuth(ctx context.Context, chatID int64, session *domain.UserSession, text string) {
+	switch text {
+	case OptionSignUp, OptionSignIn:
+		session.Auth = string(text)
+		session.State = domain.StateAwaitPhone
+		bot.tokens.Set(chatID, session)
+
+		if session.Role == domain.Creator && session.Auth == string(OptionSignUp) {
+			bot.messenger.SendStep(chatID, StepCreatorSignup)
+		} else if session.Role == domain.Creator && session.Auth == string(OptionSignIn) {
+			bot.messenger.SendStep(chatID, StepCreatorSignIn)
+		} else if session.Role == domain.Voter && session.Auth == string(OptionSignUp) {
+			bot.messenger.SendStep(chatID, StepVoterSignUp)
+		} else if session.Role == domain.Voter && session.Auth == string(OptionSignIn) {
+			bot.messenger.SendStep(chatID, StepVoterSignIn)
 		}
-		msg := tgbotapi.NewMessage(chatID, string(step.Text))
-		msg.ParseMode = "Markdown"
-		msg.ReplyMarkup = tgbotapi.ReplyKeyboardMarkup{
-			Keyboard:        rows,
-			ResizeKeyboard:  true,
-			OneTimeKeyboard: true,
-		}
-		_, err := bot.telegramBot.Send(msg)
+	default:
+		bot.messenger.Reply(chatID, string(PromptUnknown), false)
+	}
+}
+
+func (bot TelegramBot) handleAwaitPhone(ctx context.Context, chatID int64, session *domain.UserSession, phone string) {
+	session.Phone = phone
+
+	if session.Auth == string(OptionSignUp) {
+		session.State = domain.StateAwaitPassword
+		bot.tokens.Set(chatID, session)
+		bot.messenger.Reply(chatID, string(PromptAskPasswordSignUp), true)
+		return
+	}
+
+	err := bot.service.SignIn(ctx, session.TelegramID)
+	if err != nil {
+		bot.messenger.Reply(chatID, "❌ Sign-in failed: "+err.Error(), false)
+	} else {
+		bot.messenger.Reply(chatID, "✅ You are signed in successfully!", false)
+	}
+	session.State = domain.StateNone
+	bot.tokens.Set(chatID, session)
+}
+
+func (bot TelegramBot) handleAwaitPassword(ctx context.Context, chatID int64, session *domain.UserSession, password string) {
+	session.Password = password
+
+	if session.Auth == string(OptionSignUp) {
+		err := bot.service.SignUp(ctx, session.Phone, session.Password, session.TelegramID)
 		if err != nil {
-			logging.Err(err).
-				Str("text", string(step.Text)).
-				Int64("chatId", chatID).
-				Msg("error in sending message the message")
+			bot.messenger.Reply(chatID, fmt.Sprintf("❌ error in registering. %v", err.Error()), false)
+		} else {
+			bot.messenger.Reply(chatID, "You are signed up successfully!", false)
 		}
 	} else {
-		bot.reply(chatID, string(step.Text), true)
+		err := bot.service.SignIn(ctx, session.TelegramID)
+		if err != nil {
+			bot.messenger.Reply(chatID, "❌ Sign-in failed: "+err.Error(), false)
+		} else {
+			bot.messenger.Reply(chatID, "✅ You are signed in successfully!", false)
+		}
 	}
-}
 
-func (bot TelegramBot) reply(chatID int64, text string, markdown bool) {
-	logging := log.Get().With().Str("package", "bot").Str("function", "reply").Logger()
-
-	msg := tgbotapi.NewMessage(chatID, text)
-	if markdown {
-		msg.ParseMode = "Markdown"
-	}
-	_, err := bot.telegramBot.Send(msg)
-	if err != nil {
-		logging.Err(err).
-			Str("text", text).
-			Int64("chatId", chatID).
-			Msg("error in replying the message")
-	}
+	session.State = domain.StateNone
+	bot.tokens.Set(chatID, session)
 }
 
 func (bot TelegramBot) Stop() {

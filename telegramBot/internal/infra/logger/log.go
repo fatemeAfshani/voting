@@ -7,7 +7,6 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 	"io"
 	"os"
-	"runtime/debug"
 	"sync"
 	"time"
 )
@@ -50,23 +49,10 @@ func Init(config Config) error {
 
 		var output io.Writer = zerolog.MultiLevelWriter(os.Stderr, fileLogger)
 
-		var gitRevision, goVersion string
-		if buildInfo, ok := debug.ReadBuildInfo(); ok {
-			goVersion = buildInfo.GoVersion
-			for _, v := range buildInfo.Settings {
-				if v.Key == "vcs.revision" {
-					gitRevision = v.Value
-					break
-				}
-			}
-		}
-
 		log = zerolog.New(output).
 			Level(zerolog.Level(config.LogLevel)).
 			With().
 			Timestamp().
-			Str("git_revision", gitRevision).
-			Str("go_version", goVersion).
 			Logger()
 
 		initDone = true
