@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+package user;
+option go_package = "proto/user/golang";
+
+service CreatorService {
+  rpc Register(RegisterRequest) returns (CreatorLoginResponse);
+  rpc Login(RegisterRequest) returns (CreatorLoginResponse);
+  rpc LoginWithTelegram(TelegramLoginRequest) returns (CreatorLoginResponse);
+}
+
+service VoterService {
+  rpc LoginWithTelegram(TelegramLoginRequest) returns (VoterLoginResponse);
+  rpc UpdateProfile(UpdateVoterProfileRequest) returns (EmptyResponse);
+  rpc GetById(UserIdRequest) returns (UserInfo);
+}
+
+message EmptyResponse {}
+
+message RegisterRequest {
+  string phone = 1;
+  string password = 2;
+  string telegramId = 3;
+}
+
+message TelegramLoginRequest {
+  string telegramId = 1;
+}
+
+message CreatorLoginResponse {
+  string id = 1;
+  string token = 2;
+}
+
+message VoterLoginResponse {
+  string id = 1;
+  string token = 2;
+}
+
+message UserIdRequest {
+  string userId = 1;
+}
+
+message UserInfo {
+  string id = 1;
+  map<string, string> preferences = 2;
+}
+
+enum Genders {
+  MALE = 0;
+  FEMALE = 1;
+}
+
+enum EducationLevels {
+  STUDENT = 0;
+  BACHELOR = 1;
+  MASTER = 2;
+  DOCTORATE = 3;
+  OTHER =4;
+}
+
+enum  MaritalStatuses {
+  MARRIED = 0;
+  SINGLE =1 ;
+}
+
+
+message UpdateVoterProfileRequest {
+  optional string city = 1;
+  optional Genders gender = 2;
+  optional int32 age = 3;
+  optional string job =4;
+  optional EducationLevels educationLevel = 5;
+  optional string fieldOfStudy = 6;
+  optional MaritalStatuses maritalStatus = 7;
+}

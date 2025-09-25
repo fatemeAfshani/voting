@@ -13,19 +13,20 @@ const (
 	MsgAskPhoneSignUp    = "prompt.ask_phone_signup"
 	MsgAskPasswordSignUp = "prompt.ask_password_signup"
 	MsgAskPhoneSignIn    = "prompt.ask_phone_signin"
+	MsgCreatorMenu       = "prompt.creator_menu"
 	MsgUnknown           = "prompt.unknown"
-	MsgSignInSuccess     = "signin.success"
-	MsgSignInFailed      = "signin.failed"
-	MsgSignUpSuccess     = "signup.success"
+	MsgRegisterSuccess   = "signup.success"
 	MsgRegisterError     = "register.error"
 )
 
 const (
-	OptionStart   Option = "/start"
-	OptionCreator        = "option.creator"
-	OptionVoter          = "option.voter"
-	OptionSignUp         = "option.signup"
-	OptionSignIn         = "option.signin"
+	OptionStart      Option = "/start"
+	OptionCreator           = "creator"
+	OptionVoter             = "voter"
+	OptionSignUp            = "signup"
+	OptionSignIn            = "signin"
+	OptionCreatePoll        = "createPoll"
+	OptionViewPolls         = "viewPolls"
 )
 
 var StepWelcome = StepMessage{
@@ -33,12 +34,10 @@ var StepWelcome = StepMessage{
 	Options: []Option{OptionCreator, OptionVoter},
 }
 
-var StepSignInOrSignUp = StepMessage{
-	TextID:  MsgSignInOrSignUp,
-	Options: []Option{OptionSignUp, OptionSignIn},
+var StepCreatorMenu = StepMessage{
+	TextID:  MsgCreatorMenu,
+	Options: []Option{OptionCreatePoll, OptionViewPolls},
 }
 
 var StepCreatorSignup = StepMessage{TextID: MsgAskPhoneSignUp}
-var StepCreatorSignIn = StepMessage{TextID: MsgAskPhoneSignIn}
-var StepVoterSignUp = StepMessage{TextID: MsgAskPhoneSignUp}
 var StepVoterSignIn = StepMessage{TextID: MsgAskPhoneSignIn}

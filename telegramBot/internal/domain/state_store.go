@@ -18,18 +18,20 @@ const (
 	StateNone          UserState = ""
 	StateChoosingRole            = "choosing_role"
 	StateChoosingAuth            = "choosing_auth"
+	StateCreatorMenu             = "creator_menu"
 	StateAwaitPhone              = "await_phone"
 	StateAwaitPassword           = "await_password"
 )
 
 type UserSession struct {
 	Role       Role
-	Auth       string
+	UserToken  string
 	State      UserState
 	Phone      string
 	Password   string
-	TelegramID string
 	Lang       string
+	UserName   string
+	TelegramID string
 }
 
 type TokenStore struct {

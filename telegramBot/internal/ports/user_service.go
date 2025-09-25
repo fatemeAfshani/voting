@@ -2,9 +2,9 @@ package ports
 
 import "context"
 
-type UserClient interface {
-	SignIn(ctx context.Context, request SignInRequest) (SignInResponse, error)
-	SignUp(ctx context.Context, request SignUpRequest) (SignUpResponse, error)
+type UserService interface {
+	CreatorSignIn(ctx context.Context, request SignInRequest) (SignInResponse, error)
+	//SignUp(ctx context.Context, request SignUpRequest) (SignUpResponse, error)
 }
 
 type SignInRequest struct {

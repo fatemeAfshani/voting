@@ -6,21 +6,16 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/fatemeAfshani/voting/internal/domain"
-
-	grpcAdapter "github.com/fatemeAfshani/voting/internal/adapters/grpc"
+	"github.com/fatemeAfshani/voting/internal/adapters/service"
 	"github.com/fatemeAfshani/voting/internal/adapters/telegram"
 	"github.com/fatemeAfshani/voting/internal/config"
+	"github.com/fatemeAfshani/voting/internal/domain"
 	configMapper "github.com/fatemeAfshani/voting/internal/infra/config"
-	grpcClient "github.com/fatemeAfshani/voting/internal/infra/grpc"
 	log "github.com/fatemeAfshani/voting/internal/infra/logger"
-	"github.com/fatemeAfshani/voting/internal/ports"
-	"github.com/fatemeAfshani/voting/internal/service"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"go.uber.org/fx"
 	"golang.org/x/text/language"
-	"google.golang.org/grpc"
 )
 
 func ProvideConfig() (config.Config, error) {
@@ -50,20 +45,16 @@ func ProvideLogger(cfg config.Config) (log.Logger, error) {
 	return log.Get(), nil
 }
 
-func ProvideGRPCConn(cfg config.Config) (*grpc.ClientConn, error) {
-	return grpcClient.NewClient(cfg.GrpcClient)
+func ProvideUserService(cfg config.Config) (*service.UserServiceImp, error) {
+	return service.NewUserService(cfg.UserGrpcClient)
 }
 
-func ProvideUserClient(conn *grpc.ClientConn) ports.UserClient {
-	return grpcAdapter.New(conn)
+func ProvideUserDomain(userService *service.UserServiceImp, logger log.Logger) *domain.UserDomain {
+	return domain.NewUserDomain(userService, logger)
 }
 
-func ProvideService(u ports.UserClient) service.Service {
-	return service.New(u)
-}
-
-func ProvideTelegramBot(cfg config.Config, s service.Service, botApi *tgbotapi.BotAPI, tokens *domain.TokenStore, messenger telegram.Messenger, logger log.Logger) (telegram.TelegramBot, error) {
-	bot := telegram.NewTelegramBot(cfg.TelegramBotConfig, s, botApi, tokens, messenger, logger)
+func ProvideTelegramBot(cfg config.Config, botApi *tgbotapi.BotAPI, tokens *domain.TokenStore, messenger telegram.Messenger, logger log.Logger, userDomain *domain.UserDomain) (*telegram.Bot, error) {
+	bot := telegram.NewTelegramBot(cfg.TelegramBotConfig, botApi, tokens, userDomain, messenger, logger)
 	return bot, nil
 }
 
@@ -109,7 +100,7 @@ func ProvideLocalizer(bundle *i18n.Bundle) *i18n.Localizer {
 	return i18n.NewLocalizer(bundle, language.Persian.String(), language.English.String())
 }
 
-func RunTelegramBot(lc fx.Lifecycle, bot telegram.TelegramBot, logger log.Logger, cfg config.Config) {
+func RunTelegramBot(lc fx.Lifecycle, bot *telegram.Bot, logger log.Logger, cfg config.Config) {
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			logger.Info().Msg("Starting Telegram Bot...")
@@ -128,9 +119,9 @@ var Module = fx.Options(
 	fx.Provide(
 		ProvideConfig,
 		ProvideLogger,
-		ProvideGRPCConn,
-		ProvideUserClient,
-		ProvideService,
+		ProvideUserService,
+		ProvideUserDomain,
+
 		ProvideTGBotAPI,
 		ProvideTokenStore,
 		ProvideBundle,
