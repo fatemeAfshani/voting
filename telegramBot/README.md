@@ -4,7 +4,7 @@
 
 ### Protobuf
 make sure to have correct package name inside your .proto file.
-#### ```option go_package = "protos/[YOUR_SERVICE]/golang";```
+#### ```option go_package = "proto/[YOUR_SERVICE]/golang";```
 #### Example:
 option go_package = "proto/user/golang";
 ### How to generate .go files from .proto file
