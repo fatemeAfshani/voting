@@ -1,7 +1,6 @@
 package domain
 
 import (
-	"github.com/fatemeAfshani/voting/internal/adapters/telegram"
 	"strconv"
 	"sync"
 )
@@ -19,16 +18,19 @@ const (
 	StateNone          UserState = ""
 	StateChoosingRole            = "choosing_role"
 	StateChoosingAuth            = "choosing_auth"
+	StateCreatorMenu             = "creator_menu"
 	StateAwaitPhone              = "await_phone"
 	StateAwaitPassword           = "await_password"
 )
 
 type UserSession struct {
 	Role       Role
-	Auth       telegram.Option
+	UserToken  string
 	State      UserState
 	Phone      string
 	Password   string
+	Lang       string
+	UserName   string
 	TelegramID string
 }
 
@@ -50,7 +52,7 @@ func (ts *TokenStore) GetOrCreate(chatID int64) *UserSession {
 	if s, ok := ts.sessions[chatID]; ok {
 		return s
 	}
-	s := &UserSession{TelegramID: strconv.FormatInt(chatID, 10), State: StateNone}
+	s := &UserSession{TelegramID: strconv.FormatInt(chatID, 10), State: StateNone, Lang: "fa"}
 	ts.sessions[chatID] = s
 	return s
 }

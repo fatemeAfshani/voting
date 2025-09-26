@@ -1,0 +1,21 @@
+[
+  {"id":"prompt.welcome","translation":"Welcome! Are you a Creator or Voter?"},
+  {"id":"prompt.signin_or_signup","translation":"Do you want to Sign up or Sign in?"},
+  {"id":"prompt.ask_phone_signup","translation":"Please send your phone number to Sign up."},
+  {"id":"prompt.ask_password_signup","translation":"Now, please send a password for your account."},
+  {"id":"prompt.ask_phone_signin","translation":"Please send your phone number to Sign in."},
+  {"id":"prompt.unknown","translation":"I didn’t understand. Use /start."},
+  {"id":"signin.success","translation":"✅ You are signed in successfully!"},
+  {"id":"signin.failed","translation":"❌ Sign-in failed: {{.err}}"},
+  {"id":"signup.success","translation":"You are signed up successfully!"},
+  {"id":"register.error","translation":"❌ Error in registering: {{.err}}"},
+  {"id" :"prompt.creator_menu", "translation":  "Please choose one of the below options"},
+
+  {"id":"creator","translation":"Creator"},
+  {"id":"voter","translation":"Voter"},
+  {"id":"signup","translation":"Sign up"},
+  {"id":"signin","translation":"Sign in"},
+  {"id":"createPoll","translation":"create poll"},
+  {"id":"viewPolls","translation":"view my polls"}
+]
+

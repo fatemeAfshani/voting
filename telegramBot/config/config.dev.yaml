@@ -1,6 +1,6 @@
 total_shutdown_timeout: 5s
 
-grpc_client:
+user_grpc_client:
   host: localhost
   port: 9090
 

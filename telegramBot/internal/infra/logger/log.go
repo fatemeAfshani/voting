@@ -2,12 +2,12 @@ package logger
 
 import (
 	"context"
+	"github.com/fatemeAfshani/voting/internal/config"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/pkgerrors"
 	"gopkg.in/natefinch/lumberjack.v2"
 	"io"
 	"os"
-	"runtime/debug"
 	"sync"
 	"time"
 )
@@ -21,24 +21,15 @@ var (
 	initDone bool
 )
 
-type Config struct {
-	FilePath         string `koanf:"file_path"`
-	UseLocalTime     bool   `koanf:"use_local_time"`
-	MustCompress     bool   `koanf:"compress"`
-	LogLevel         int    `koanf:"level"`
-	FileMaxSizeInMB  int    `koanf:"file_max_size_in_mb"`
-	FileMaxAgeInDays int    `koanf:"file_max_age_in_days"`
-	FileMaxBackups   int    `koanf:"file_max_backups"`
-}
-
-func Init(config Config) error {
+func Init(config config.LoggerConfig) error {
 	once.Do(func() {
 		zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
 		if config.UseLocalTime {
-			zerolog.TimeFieldFormat = time.RFC3339
+			zerolog.TimestampFunc = func() time.Time { return time.Now() }
 		} else {
-			zerolog.TimeFieldFormat = time.RFC3339Nano
+			zerolog.TimestampFunc = func() time.Time { return time.Now().UTC() }
 		}
+		zerolog.TimeFieldFormat = time.RFC3339Nano
 
 		fileLogger := &lumberjack.Logger{
 			Filename:   config.FilePath,
@@ -50,23 +41,10 @@ func Init(config Config) error {
 
 		var output io.Writer = zerolog.MultiLevelWriter(os.Stderr, fileLogger)
 
-		var gitRevision, goVersion string
-		if buildInfo, ok := debug.ReadBuildInfo(); ok {
-			goVersion = buildInfo.GoVersion
-			for _, v := range buildInfo.Settings {
-				if v.Key == "vcs.revision" {
-					gitRevision = v.Value
-					break
-				}
-			}
-		}
-
 		log = zerolog.New(output).
 			Level(zerolog.Level(config.LogLevel)).
 			With().
 			Timestamp().
-			Str("git_revision", gitRevision).
-			Str("go_version", goVersion).
 			Logger()
 
 		initDone = true
