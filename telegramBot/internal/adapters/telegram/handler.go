@@ -131,7 +131,9 @@ func (bot *Bot) handleAwaitPhone(chatID int64, session *domain.UserSession, phon
 
 func (bot *Bot) handleAwaitPassword(ctx context.Context, chatID int64, session *domain.UserSession, updateData tgbotapi.Update) {
 	session.Password = updateData.Message.Text
-	session.UserName = updateData.Message.From.FirstName
+	if updateData.Message.From != nil {
+		session.UserName = updateData.Message.From.FirstName
+	}
 
 	isRegistered, err := bot.userDomain.RegisterCreator(ctx, session)
 	if err != nil {

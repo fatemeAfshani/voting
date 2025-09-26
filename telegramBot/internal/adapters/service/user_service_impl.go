@@ -24,7 +24,7 @@ func NewUserService(cfg config.GRPCConfig, logger log.Logger) (*UserServiceImp, 
 
 	conn, err := grpc.NewClient(address, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		logger.Error().Msgf("failed to connect to gRPC server at %s: %w", address, err)
+		logger.Error().Err(err).Msgf("failed to connect to gRPC server at %s", address)
 		return nil, err
 	}
 

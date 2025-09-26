@@ -103,7 +103,7 @@ func ProvideLocalizer(bundle *i18n.Bundle) *i18n.Localizer {
 	return i18n.NewLocalizer(bundle, language.Persian.String(), language.English.String())
 }
 
-func RunTelegramBot(lc fx.Lifecycle, bot *telegram.Bot, logger log.Logger, cfg config.Config) {
+func RunTelegramBot(lc fx.Lifecycle, bot *telegram.Bot, logger log.Logger) {
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			logger.Info().Msg("Starting Telegram Bot...")
