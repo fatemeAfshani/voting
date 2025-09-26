@@ -25,10 +25,11 @@ func Init(config config.LoggerConfig) error {
 	once.Do(func() {
 		zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
 		if config.UseLocalTime {
-			zerolog.TimeFieldFormat = time.RFC3339
+			zerolog.TimestampFunc = func() time.Time { return time.Now() }
 		} else {
-			zerolog.TimeFieldFormat = time.RFC3339Nano
+			zerolog.TimestampFunc = func() time.Time { return time.Now().UTC() }
 		}
+		zerolog.TimeFieldFormat = time.RFC3339Nano
 
 		fileLogger := &lumberjack.Logger{
 			Filename:   config.FilePath,

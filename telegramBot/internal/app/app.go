@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -45,8 +46,8 @@ func ProvideLogger(cfg config.Config) (log.Logger, error) {
 	return log.Get(), nil
 }
 
-func ProvideUserService(cfg config.Config) (*service.UserServiceImp, error) {
-	return service.NewUserService(cfg.UserGrpcClient)
+func ProvideUserService(cfg config.Config, logger log.Logger) (*service.UserServiceImp, error) {
+	return service.NewUserService(cfg.UserGrpcClient, logger)
 }
 
 func ProvideUserDomain(userService *service.UserServiceImp, logger log.Logger) *domain.UserDomain {
@@ -80,6 +81,8 @@ func ProvideMessenger(bot *tgbotapi.BotAPI, logger log.Logger, loc *i18n.Localiz
 
 func ProvideBundle() (*i18n.Bundle, error) {
 	b := i18n.NewBundle(language.Persian)
+	b.RegisterUnmarshalFunc("json", json.Unmarshal)
+
 	wd, err := os.Getwd()
 	if err != nil {
 		return nil, fmt.Errorf("i18n: getwd failed: %w", err)

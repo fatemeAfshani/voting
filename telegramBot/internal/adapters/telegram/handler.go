@@ -133,7 +133,10 @@ func (bot *Bot) handleAwaitPassword(ctx context.Context, chatID int64, session *
 	session.Password = updateData.Message.Text
 	session.UserName = updateData.Message.From.FirstName
 
-	isRegistered, _ := bot.userDomain.RegisterCreator(ctx, session)
+	isRegistered, err := bot.userDomain.RegisterCreator(ctx, session)
+	if err != nil {
+		bot.logger.Error().Err(err).Msg("creator registration failed")
+	}
 	if isRegistered {
 		session.State = domain.StateCreatorMenu
 	} else {

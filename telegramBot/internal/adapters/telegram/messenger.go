@@ -23,7 +23,8 @@ func (m Messenger) Reply(chatID int64, text string, markdown bool) {
 
 	msg := tgbotapi.NewMessage(chatID, text)
 	if markdown {
-		msg.ParseMode = "Markdown"
+		msg.ParseMode = tgbotapi.ModeMarkdownV2
+		msg.Text = tgbotapi.EscapeText(tgbotapi.ModeMarkdownV2, text)
 	}
 	_, err := m.bot.Send(msg)
 	if err != nil {
@@ -51,7 +52,8 @@ func (m Messenger) SendStep(chatID int64, step StepMessage) {
 			))
 		}
 		msg := tgbotapi.NewMessage(chatID, m.localize(step.TextID))
-		msg.ParseMode = "Markdown"
+		msg.ParseMode = tgbotapi.ModeMarkdownV2
+		msg.Text = tgbotapi.EscapeText(tgbotapi.ModeMarkdownV2, msg.Text)
 		msg.ReplyMarkup = tgbotapi.ReplyKeyboardMarkup{
 			Keyboard:        rows,
 			ResizeKeyboard:  true,

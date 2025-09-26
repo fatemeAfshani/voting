@@ -9,10 +9,13 @@
   {"id":"signin.failed","translation":"❌ Sign-in failed: {{.err}}"},
   {"id":"signup.success","translation":"You are signed up successfully!"},
   {"id":"register.error","translation":"❌ Error in registering: {{.err}}"},
+  {"id" :"prompt.creator_menu", "translation":  "Please choose one of the below options"},
 
-  {"id":"option.creator","translation":"Creator"},
-  {"id":"option.voter","translation":"Voter"},
-  {"id":"option.signup","translation":"Sign up"},
-  {"id":"option.signin","translation":"Sign in"}
+  {"id":"creator","translation":"Creator"},
+  {"id":"voter","translation":"Voter"},
+  {"id":"signup","translation":"Sign up"},
+  {"id":"signin","translation":"Sign in"},
+  {"id":"createPoll","translation":"create poll"},
+  {"id":"viewPolls","translation":"view my polls"}
 ]
 

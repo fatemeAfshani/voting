@@ -56,12 +56,12 @@ enum EducationLevels {
   BACHELOR = 1;
   MASTER = 2;
   DOCTORATE = 3;
-  OTHER =4;
+  OTHER = 4;
 }
 
-enum  MaritalStatuses {
+enum MaritalStatuses {
   MARRIED = 0;
-  SINGLE =1 ;
+  SINGLE = 1;
 }
 
 
