@@ -5,6 +5,8 @@ import "context"
 type UserService interface {
 	CreatorSignIn(ctx context.Context, request SignInRequest) (SignInResponse, error)
 	CreatorRegister(ctx context.Context, request SignUpRequest) (SignUpResponse, error)
+
+	VoterSignIn(ctx context.Context, request SignInRequest) (SignInResponse, error)
 }
 
 type SignInRequest struct {

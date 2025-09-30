@@ -17,10 +17,10 @@ type UserState string
 const (
 	StateNone          UserState = ""
 	StateChoosingRole            = "choosing_role"
-	StateChoosingAuth            = "choosing_auth"
 	StateCreatorMenu             = "creator_menu"
 	StateAwaitPhone              = "await_phone"
 	StateAwaitPassword           = "await_password"
+	StateVoterMenu               = "voter_menu"
 )
 
 type UserSession struct {

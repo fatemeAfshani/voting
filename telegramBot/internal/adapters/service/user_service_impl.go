@@ -49,7 +49,7 @@ func (c *UserServiceImp) CreatorSignIn(ctx context.Context, request ports.SignIn
 		return ports.SignInResponse{}, err
 	}
 	if res == nil {
-		return ports.SignInResponse{}, fmt.Errorf("nil LoginWithTelegram response")
+		return ports.SignInResponse{}, fmt.Errorf("nil creator LoginWithTelegram response")
 	}
 	return ports.SignInResponse{
 		Token: res.GetToken(),
@@ -76,6 +76,27 @@ func (c *UserServiceImp) CreatorRegister(ctx context.Context, request ports.Sign
 	}
 
 	return ports.SignUpResponse{
+		Token: res.GetToken(),
+		Id:    res.GetId(),
+	}, nil
+}
+
+func (c *UserServiceImp) VoterSignIn(ctx context.Context, request ports.SignInRequest) (ports.SignInResponse, error) {
+	rpcCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	req := &golang.TelegramLoginRequest{
+		TelegramId: request.TelegramId,
+	}
+
+	res, err := c.voterClient.LoginWithTelegram(rpcCtx, req)
+	if err != nil {
+		return ports.SignInResponse{}, err
+	}
+	if res == nil {
+		return ports.SignInResponse{}, fmt.Errorf("nil voter LoginWithTelegram response")
+	}
+	return ports.SignInResponse{
 		Token: res.GetToken(),
 		Id:    res.GetId(),
 	}, nil
