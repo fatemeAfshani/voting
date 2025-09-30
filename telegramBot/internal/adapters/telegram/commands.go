@@ -9,24 +9,28 @@ type Option string
 
 const (
 	MsgWelcome           = "prompt.welcome"
-	MsgSignInOrSignUp    = "prompt.signin_or_signup"
 	MsgAskPhoneSignUp    = "prompt.ask_phone_signup"
 	MsgAskPasswordSignUp = "prompt.ask_password_signup"
-	MsgAskPhoneSignIn    = "prompt.ask_phone_signin"
 	MsgCreatorMenu       = "prompt.creator_menu"
-	MsgUnknown           = "prompt.unknown"
-	MsgRegisterSuccess   = "signup.success"
-	MsgRegisterError     = "register.error"
+
+	MsgUnknown         = "prompt.unknown"
+	MsgRegisterSuccess = "signup.success"
+	MsgRegisterError   = "register.error"
+
+	MsgVoterMenu = "prompt.voter_menu"
 )
 
 const (
-	OptionStart      Option = "/start"
-	OptionCreator           = "creator"
-	OptionVoter             = "voter"
-	OptionSignUp            = "signup"
-	OptionSignIn            = "signin"
-	OptionCreatePoll        = "createPoll"
-	OptionViewPolls         = "viewPolls"
+	OptionStart           Option = "/start"
+	OptionCreator                = "creator"
+	OptionVoter                  = "voter"
+	OptionSignUp                 = "signup"
+	OptionSignIn                 = "signin"
+	OptionCreatePoll             = "createPoll"
+	OptionViewPolls              = "viewPolls"
+	OptionViewActivePolls        = "viewActivePolls"
+	OptionCompleteProfile        = "completeVoterProfile"
+	OptionPollHistory            = "viewPollHistory"
 )
 
 var StepWelcome = StepMessage{
@@ -34,10 +38,14 @@ var StepWelcome = StepMessage{
 	Options: []Option{OptionCreator, OptionVoter},
 }
 
+var StepCreatorSignup = StepMessage{TextID: MsgAskPhoneSignUp}
+
 var StepCreatorMenu = StepMessage{
 	TextID:  MsgCreatorMenu,
 	Options: []Option{OptionCreatePoll, OptionViewPolls},
 }
 
-var StepCreatorSignup = StepMessage{TextID: MsgAskPhoneSignUp}
-var StepVoterSignIn = StepMessage{TextID: MsgAskPhoneSignIn}
+var StepVoterMenu = StepMessage{
+	TextID:  MsgVoterMenu,
+	Options: []Option{OptionViewActivePolls, OptionCompleteProfile, OptionPollHistory},
+}

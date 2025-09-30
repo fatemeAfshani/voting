@@ -44,3 +44,16 @@ func (d *UserDomain) RegisterCreator(ctx context.Context, session *UserSession) 
 	}
 	return false, nil
 }
+
+func (d *UserDomain) VoterSignIn(ctx context.Context, session *UserSession) (bool, error) {
+	if session.TelegramID != "" {
+		response, err := d.userService.VoterSignIn(ctx, ports.SignInRequest{TelegramId: session.TelegramID})
+		if err != nil {
+			d.logger.Error().Msg("unable to signIn voter automatically")
+			return false, err
+		}
+		session.UserToken = response.Token
+		return true, err
+	}
+	return false, nil
+}

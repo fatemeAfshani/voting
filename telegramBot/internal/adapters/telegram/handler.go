@@ -37,6 +37,10 @@ func NewTelegramBot(
 	}
 }
 
+// todo: add queue for messages
+// todo: complete corner cases of the state machine
+// todo: make messages virtually beautiful(show options on screen not in keyword)
+
 func (bot *Bot) Start(ctx context.Context) {
 	logger := bot.logger.With().Str("package", "bot").Str("function", "start").Logger()
 
@@ -110,9 +114,18 @@ func (bot *Bot) handleChoosingRole(ctx context.Context, chatID int64, session *d
 
 		case OptionVoter:
 			session.Role = domain.Voter
-			session.State = domain.StateChoosingAuth
+			isSignedIn, _ := bot.userDomain.VoterSignIn(ctx, session)
+			if isSignedIn {
+				session.State = domain.StateVoterMenu
+			} else {
+				session.State = domain.StateNone
+			}
 			bot.tokens.Set(chatID, session)
-			bot.messenger.SendStep(chatID, StepCreatorSignup)
+			if isSignedIn {
+				bot.messenger.SendStep(chatID, StepVoterMenu)
+			} else {
+				bot.messenger.Reply(chatID, bot.messenger.localize(MsgUnknown), false)
+			}
 		default:
 			bot.messenger.Reply(chatID, bot.messenger.localize(MsgUnknown), false)
 		}
